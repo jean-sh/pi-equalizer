@@ -1,4 +1,4 @@
-# pi-sense-visualizer
+# PiSense Visualizer
 A sound visualizer for the Raspberry Pi's Sense Hat LED display.
 
 Written in Python.
