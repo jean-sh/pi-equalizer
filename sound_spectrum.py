@@ -5,6 +5,7 @@
 # Deps: PyAudio, NumPy, and Matplotlib
 # Blog: http://blog.yjl.im/2012/11/frequency-spectrum-of-sound-using.html
 
+
 from __future__ import print_function
 
 import struct
@@ -19,11 +20,14 @@ WIDTH = 1280
 HEIGHT = 720
 FPS = 25.0
 
-nFFT = 512
+nFFT = 9   # default: 512
 BUF_SIZE = 4 * nFFT
 SAMPLE_SIZE = 2
 CHANNELS = 2
 RATE = 44100
+
+
+ndarray_test = open("ndarray_test", "w")
 
 
 def animate(i, line, wf, MAX_y):
@@ -34,7 +38,7 @@ def animate(i, line, wf, MAX_y):
     N *= nFFT
     data = wf.readframes(N)
     print('{:5.1f}% - V: {:5,d} - A: {:10,d} / {:10,d}'.format(
-        100.0 * wf.tell() / wf.getnframes(), i, wf.tell(), wf.getnframes()
+       100.0 * wf.tell() / wf.getnframes(), i, wf.tell(), wf.getnframes()
     ))
 
     # Unpack data, LRLRLR...
@@ -47,6 +51,9 @@ def animate(i, line, wf, MAX_y):
 
     # Sewing FFT of two channels together, DC part uses right channel's
     Y = abs(np.hstack((Y_L[-nFFT / 2:-1], Y_R[:nFFT / 2])))
+
+    # Writing the values to a file
+    ndarray_test.write(str(Y))
 
     line.set_ydata(Y)
     return line,
@@ -84,7 +91,7 @@ def main():
     drawid = fig.canvas.mpl_connect('draw_event', change_xlabel)
 
     MAX_y = 2.0 ** (SAMPLE_SIZE * 8 - 1)
-    wf = wave.open('stress.wav', 'rb')
+    wf = wave.open('stress3.wav', 'rb')
     assert wf.getnchannels() == CHANNELS
     assert wf.getsampwidth() == SAMPLE_SIZE
     assert wf.getframerate() == RATE
@@ -97,6 +104,7 @@ def main():
     )
     ani.save('temp.mp4', fps=FPS)
 
+    ndarray_test.close()
     wf.close()
 
 
