@@ -29,19 +29,17 @@ from sense_hat import SenseHat
 
 
 class Matrix(SenseHat):
-	"""
-	Class containing additional methods for operating the LED matrix
-	"""
-	
-	
-	def __init__(self):
-		SenseHat.__init__(self)
-		
-	
-	def set_column(self, col, pixel_list):
-		"""
-		Accepts a column number and a list of 8 pixels and sets	the pixels
-		in this column to the values in the list (from bottom to top)
-		"""
-		for x in range(len(pixel_list)):
-			self.set_pixel(x, col, pixel_list[x])
+    """
+    Class containing additional methods for operating the LED matrix
+    """
+
+    def __init__(self):
+        SenseHat.__init__(self)
+
+    def set_column(self, col, pixel_list):
+        """
+        Accepts a column number and a list of 8 pixels and sets	the pixels
+        in this column to the values in the list (from bottom to top)
+        """
+        for x in range(len(pixel_list)):
+            self.set_pixel(x, col, pixel_list[x])
