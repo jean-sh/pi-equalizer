@@ -25,37 +25,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import time
 from matrix import Matrix
-
 
 matrix = Matrix()
 
 
 def volume_to_pixels(v):
-	px = int(v * 2.55)
-	return [px, px, px]
+    px = int(v * 2.55)
+    return [px, px, px]
 
 
 def main(args):
-	
-	matrix.set_rotation(180)
-	matrix.low_light = True
-	i = 0
-	while i < 8: 
-		matrix.set_column(i, [(100, 0, 0), (100, 0, 0), (100, 0, 0), 
-		(100, 0, 0), (100, 0, 0), (100, 0, 0), (100, 0, 0), (100, 0, 0)])
-		time.sleep(1)
-		i += 1
-	
-	time.sleep(2)
-	matrix.clear(volume_to_pixels(10))
-	time.sleep(1)
-	matrix.clear(volume_to_pixels(0))
-	
-	
-	return 0
+
+    matrix.set_rotation(180)
+    matrix.low_light = True
+    i = 0
+    while i < 8:
+        matrix.set_column(i, [(100, 0, 0), (100, 0, 0), (100, 0, 0),
+        (100, 0, 0), (100, 0, 0), (100, 0, 0), (100, 0, 0), (100, 0, 0)])
+        time.sleep(1)
+        i += 1
+
+    time.sleep(2)
+    matrix.clear(volume_to_pixels(10))
+    time.sleep(1)
+    matrix.clear(volume_to_pixels(0))
+
+    return 0
 
 if __name__ == '__main__':
-	import sys
-	sys.exit(main(sys.argv))
+    import sys
+    sys.exit(main(sys.argv))
