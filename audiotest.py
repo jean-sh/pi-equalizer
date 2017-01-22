@@ -25,15 +25,45 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-## Plots the values from one frame as extracted by 'streaming_extractor_music' from Essentia
 import matplotlib.pyplot as plt
+import itertools
+
+##
+# Plots the values from one frame as extracted by 'sound_spectrum.py'
+##
+def extract_and_plot_values_from_ndarray(one_frame):
+    with open(one_frame, "r") as frame:
+        list_frame = [line.strip("[] \n") for line in frame]
+
+    values_by_line = []
+    for i in list_frame:
+        values_by_line.append(i.split("  "))
+
+    values_str = list(itertools.chain.from_iterable(values_by_line))
+    print(values_str)
+
+    values = []
+    for s in values_str:
+        try:
+            values.append(float(s))
+        except ValueError:
+            print("error")
+            pass
+    print(values)
+    plt.plot(values, '.')
+    plt.ylabel("valeurs")
+    plt.show()
 
 
+
+##
+# Plots the values from one frame as extracted by 'streaming_extractor_music' from Essentia
+##
 def extract_and_plot_values_from_mel_bands(frame_file):
     with open(frame_file, "r") as frame:
         s_frame = frame.readline()
 
-    s_values = s_frame.split(",")
+    s_values = s_frame.split("    ")
     s_values[0] = s_values[0].strip("[")
     s_values[len(s_values) - 1] = s_values[len(s_values) - 1].strip("\n]")
 
@@ -46,10 +76,11 @@ def extract_and_plot_values_from_mel_bands(frame_file):
     plt.ylabel("valeurs")
     plt.show()
 
-extract_and_plot_values_from_mel_bands('essentia_tests/one_frame')
 
-
-## Plays a wave file
+'''
+##
+# Plays a wave file
+##
 import pyaudio
 import wave
 import time
@@ -91,3 +122,4 @@ wf.close()
 
 # close PyAudio
 p.terminate()
+'''
