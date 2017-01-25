@@ -1,4 +1,4 @@
 *.pyc
 pi-sense-visualizer
-stress.*
+stress*.*
 essentia_tests
