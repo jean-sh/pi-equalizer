@@ -33,12 +33,23 @@ from pyAudioAnalysis import audioBasicIO
 from pyAudioAnalysis import audioFeatureExtraction
 import struct
 
-def audio_spectrum(wav_file_path, nb_of_frames):
+def audio_spectrum(wav_file_path, nb_of_frames=16384, nb_of_points=256):
     """
-    Extracts and plots the audio spectrum of the given wav file from the nb_of_frames first frames
+    Extracts and plots the audio spectrum of a wav file from the first frames
+    :param
+    wav_file_path:
+    The wav file to extract the spectrum from
+    nb_of_frames:
+    The number of frames to extract the spectrum from
+    nb_of_points:
+    The number of points to calculate the Fast Fourier Transform
+    :return
+    The array of frequencies
+    The array of corresponding intensities
     """
 
     wav_file = wave.open(wav_file_path, 'r')
+    wav_file.readframes(nb_of_frames)
     data = wav_file.readframes(nb_of_frames)
     sampling_rate = wav_file.getframerate()
     nb_of_channels = wav_file.getnchannels()
@@ -47,18 +58,29 @@ def audio_spectrum(wav_file_path, nb_of_frames):
     data = struct.unpack('{n}h'.format(n=nb_of_channels * nb_of_frames), data)
     data = np.array(data)
 
-    w = np.fft.fft(data)
-    freqs = np.fft.fftfreq(len(w))
+    # Calculate the Fourier Transform coefficients
+    fft_array = np.fft.fft(data, nb_of_points)
 
+    # Calculate the power in each frequency
+    intensities = []
+    for coef in fft_array:
+        intensities.append(abs(coef))
+
+    # Calculate the frequencies associated
+    freqs = np.fft.fftfreq(len(fft_array))
     freqs_in_hertz = []
     for freq in freqs:
         freqs_in_hertz.append(abs(freq * sampling_rate))
 
-    plt.plot(freqs_in_hertz, abs(w))
+    plt.loglog(freqs_in_hertz, intensities, basex=2, basey=10)
+    #plt.xscale("log")
+    #plt.yscale("log")
     plt.show()
 
+    return freqs_in_hertz, intensities
 
-audio_spectrum("stressmono3.wav", 32768)
+
+audio_spectrum("stressmono3.wav", 32768, 1024)
 
 
 def audio_to_ndarray(wavfile):
