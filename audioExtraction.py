@@ -27,23 +27,38 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy as sp
 import wave
 from pyAudioAnalysis import audioBasicIO
 from pyAudioAnalysis import audioFeatureExtraction
 import struct
 
-def audio_spectrum():
-    wav_file = wave.open("stressmono.wav", 'r')
-    data = wav_file.readframes(1000)
+def audio_spectrum(wav_file_path, nb_of_frames):
+    """
+    Extracts and plots the audio spectrum of the given wav file from the nb_of_frames first frames
+    """
+
+    wav_file = wave.open(wav_file_path, 'r')
+    data = wav_file.readframes(nb_of_frames)
+    sampling_rate = wav_file.getframerate()
+    nb_of_channels = wav_file.getnchannels()
     wav_file.close()
-    data = struct.unpack('{n}h'.format(n=1000), data)
+
+    data = struct.unpack('{n}h'.format(n=nb_of_channels * nb_of_frames), data)
     data = np.array(data)
 
     w = np.fft.fft(data)
     freqs = np.fft.fftfreq(len(w))
-    print(freqs.min(), freqs.max())
 
-audio_spectrum()
+    freqs_in_hertz = []
+    for freq in freqs:
+        freqs_in_hertz.append(abs(freq * sampling_rate))
+
+    plt.plot(freqs_in_hertz, abs(w))
+    plt.show()
+
+
+audio_spectrum("stressmono3.wav", 32768)
 
 
 def audio_to_ndarray(wavfile):
