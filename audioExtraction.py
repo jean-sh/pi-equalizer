@@ -33,7 +33,7 @@ from pyAudioAnalysis import audioBasicIO
 from pyAudioAnalysis import audioFeatureExtraction
 import struct
 
-def audio_spectrum(wav_file_path, nb_of_frames=16384, nb_of_points=256):
+def audio_spectrum(wav_file_path, nb_of_frames=2048, nb_of_points=128):
     """
     Extracts and plots the audio spectrum of a wav file from the first frames
     :param
@@ -72,15 +72,15 @@ def audio_spectrum(wav_file_path, nb_of_frames=16384, nb_of_points=256):
     for freq in freqs:
         freqs_in_hertz.append(abs(freq * sampling_rate))
 
-    plt.loglog(freqs_in_hertz, intensities, basex=2, basey=10)
-    #plt.xscale("log")
-    #plt.yscale("log")
+    plt.plot(freqs_in_hertz, intensities)
+    plt.xscale("log")
+    plt.yscale("log")
     plt.show()
 
     return freqs_in_hertz, intensities
 
 
-audio_spectrum("stressmono3.wav", 32768, 1024)
+audio_spectrum("stressmono3.wav", nb_of_points=32)
 
 
 def audio_to_ndarray(wavfile):
