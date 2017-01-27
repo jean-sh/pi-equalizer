@@ -1,7 +1,7 @@
-# PiSense Visualizer
-A sound visualizer for the Raspberry Pi Sense Hat's LED display, written in Python.
+# piEqualizer
+An audio visualizer for the Raspberry Pi Sense Hat's LED display, written in Python.
 
-Work in progress, not functional as of yet.
+Work in progress, not functional yet.
 
 Done:
 * function to update 1 column of LEDs at a time (the easiest part)
