@@ -143,13 +143,14 @@ def complete_audio_spectrum(wav_file_path, sample_size=2048, nb_of_points=2048):
     for freq in freqs:
         freqs_in_hertz.append(abs(freq * sampling_rate))
     # print(freqs_in_hertz)
+    '''
     for f in intensity_data:
         plt.plot(freqs_in_hertz, f)
         plt.ylim(0, 100000)
         #plt.xscale("log")
         #plt.yscale("symlog")
         plt.show()
-
+    '''
     return freqs_in_hertz, intensity_data
 
 complete_audio_spectrum("stressmono3.wav")
