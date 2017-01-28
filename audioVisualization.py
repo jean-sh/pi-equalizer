@@ -27,9 +27,10 @@
 
 import audioExtraction as aex
 import matplotlib.pyplot as plt
+import math
 
 
-def linear_average(freq_data, intensity_data, nb_of_points=8):
+def avg_linear_range(freq_data, intensity_data, nb_of_points=8):
     length = len(freq_data)
     size = length // nb_of_points
 
@@ -38,14 +39,51 @@ def linear_average(freq_data, intensity_data, nb_of_points=8):
         f = sum(freq_data[n*size:(n+1)*size]) // size
         freq_avg.append(f)
 
-    inten_avg = []
+    intens_avg = []
     for j, frame_intensities in enumerate(intensity_data):
         frame_avg = []
         for n in range(nb_of_points):
             i = sum(frame_intensities[n*size:(n+1)*size]) // size
             frame_avg.append(i)
-        inten_avg.append(frame_avg)
-    return freq_avg, inten_avg
+        intens_avg.append(frame_avg)
+    return freq_avg, intens_avg
+
+
+def avg_custom_range(freq_data, intensity_data):
+    """
+    Averages intensities in 8 groups in ranges growing as 2.25^n
+    :param freq_data:
+    :param intensity_data:
+    :return:
+    """
+    length = len(freq_data)
+    custom_freqs = [58, 130, 292, 657, 1478, 3325, 7482, 16834]
+
+    # Discard the last half, which only repeats the first half of the array
+    for idx, f in enumerate(intensity_data):
+        intensity_data[idx] = f[1:(length // 2) + 1]
+
+    # Calculate frequency boundaries
+    boundaries = []
+    for i in range(len(custom_freqs) - 1):
+        b = math.sqrt((custom_freqs[i] * custom_freqs[i+1]))
+        boundaries.append(b)
+    boundaries.append(22050)
+
+    # Calculate averages
+    intens_avg = []
+    for frame in intensity_data:
+        frame_avg = []
+        for bd in boundaries:
+            domain = []
+            i = 0
+            while freq_data[i] < bd:
+                domain.append(frame[i])
+                i += 1
+            frame_avg.append(sum(domain) / len(custom_freqs))
+        intens_avg.append(frame_avg)
+
+    return custom_freqs, intens_avg
 
 
 def bar_plot(freq_data, intensity_data):
@@ -71,11 +109,12 @@ def rescale_intensity(intensity_data):
 
     return i_rescaled
 
-'''
-freq, intensity = aex.complete_audio_spectrum("stressmono3.wav")
-freq, intensity = linear_average(freq, intensity)
+
+freq, intensity = aex.complete_audio_spectrum("stress3.wav")
+freq, intensity = avg_custom_range(freq, intensity)
 intensity = rescale_intensity(intensity)
 
-for f in intensity:
-    bar_plot(freq, f)
-'''
+for f in intensity[6:]:
+    plt.loglog(freq, f)
+    plt.ylim(0, 220)
+    plt.show()
