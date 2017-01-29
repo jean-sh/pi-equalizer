@@ -33,7 +33,10 @@ import struct
 import threading
 import queue
 import audioVisualization as avi
+from matrix import Matrix
 
+d = Matrix()
+d.set_rotation(270)
 
 def extract(data, frame_count, nb_channels, frame_rate, q, nb_of_points=128):
     """
@@ -76,6 +79,13 @@ def extract(data, frame_count, nb_channels, frame_rate, q, nb_of_points=128):
     q.put(intensities)
 
 
+def display(freqs, intensities):
+    freqs, intensities = avi.avg_custom_range_one_chunk(freqs, intensities)
+    intensities = avi.rescale_intensity(intensities)
+    for i in range(len(freqs)):
+        d.set_column(i, d.mode_one(int(intensities[i])))
+
+
 ##
 # Plays a wave file and extracts the audio spectrum at the same time
 ##
@@ -96,7 +106,7 @@ def play_and_extract(wav_file):
 
         # Create the extract thread
         extract_thread = threading.Thread(target=extract,
-                                          args=(data, frame_count, nb_channels, frame_rate, q, 512))
+                                          args=(data, frame_count, nb_channels, frame_rate, q, 64))
         extract_thread.start()
 
         # Block until extracting is done and queue is empty
@@ -105,9 +115,9 @@ def play_and_extract(wav_file):
         intensities = q.get()
 
         # Process the extracted data for displaying
-        freqs, intensities = avi.avg_custom_range_one_chunk(freqs, intensities)
-        intensities = avi.rescale_intensity(intensities)
-        print(freqs, intensities)
+        display_thread = threading.Thread(target=display,
+                                          args=(freqs, intensities))
+        display_thread.start()
         return data, pyaudio.paContinue
 
     # open stream using callback
