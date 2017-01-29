@@ -133,7 +133,7 @@ def bar_plot(freq_data, intensity_data):
 
 def rescale_intensity(intensity_data):
     # Nothing clever, found through trial and error to get a pleasing visual result
-    i_max = 1600000
+    i_max = 100000
     i_rescaled = []
     for i in intensity_data:
         i_rescaled.append((i / i_max) * 200 + 55)
@@ -141,9 +141,11 @@ def rescale_intensity(intensity_data):
     return i_rescaled
 
 def avg_and_rescale(freq_ranges, freqs_hertz, intensities):
+    ''' What is this for again?
     length = len(intensities)
     # Discard the last half, which only repeats the first half of the array
     half_intensities = intensities[1:(length // 2) + 1]
+    '''
 
     # Calculate averages
     intens_avg = []
@@ -152,17 +154,17 @@ def avg_and_rescale(freq_ranges, freqs_hertz, intensities):
     for fr in freq_ranges:
         domain = []
         while freqs_hertz[i] < fr:
-            domain.append(half_intensities[i])
+            domain.append(intensities[i])
 
             i += 1
         intens_avg.append(sum(domain) / len(freq_ranges))
         
     
     # Rescale    
-    # Nothing clever, found through trial and error to get a pleasing visual result
+    # (temporary)
     i_max = 100000
     i_rescaled = []
     for i in intens_avg:
-        i_rescaled.append((i / i_max) * 215 + 45)
+        i_rescaled.append((i / i_max) * 225 + 30)
     return i_rescaled
     
