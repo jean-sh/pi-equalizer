@@ -47,10 +47,11 @@ def audio_spectrum(wav_file_path, nb_of_frames=2205, nb_of_points=128):
     """
 
     wav_file = wave.open(wav_file_path, 'r')
+    # wav_file.readframes(50000)
     data = wav_file.readframes(nb_of_frames)
     sampling_rate = wav_file.getframerate()
     nb_of_channels = wav_file.getnchannels()
-    print(wav_file.tell())
+
     wav_file.close()
 
     data = struct.unpack('{n}h'.format(n=nb_of_channels * nb_of_frames), data)
@@ -63,20 +64,12 @@ def audio_spectrum(wav_file_path, nb_of_frames=2205, nb_of_points=128):
     intensities = []
     for coef in fft_array:
         intensities.append(abs(coef))
-    print(intensities)
 
     # Calculate the frequencies associated
     freqs = np.fft.fftfreq(len(fft_array))
     freqs_in_hertz = []
     for freq in freqs:
         freqs_in_hertz.append(abs(freq * sampling_rate))
-    print(freqs_in_hertz)
-
-    plt.plot(freqs_in_hertz, intensities)
-    #plt.xscale("log")
-    #plt.yscale("log")
-    plt.show()
-
     return freqs_in_hertz, intensities
 
 
@@ -153,4 +146,4 @@ def complete_audio_spectrum(wav_file_path, sample_size=2048, nb_of_points=2048):
     '''
     return freqs_in_hertz, intensity_data
 
-complete_audio_spectrum("stressmono3.wav")
+#complete_audio_spectrum("stressmono3.wav")
