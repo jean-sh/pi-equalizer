@@ -31,11 +31,11 @@ import numpy as np
 import time
 import struct
 import threading
+import multiprocessing as mp
 import queue
 import math
 import audioVisualization as avi
 from matrix import Matrix
-
 d = Matrix()
 d.set_rotation(270)
 
@@ -106,7 +106,7 @@ def calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels, nb_of
     # Calculate frequency boundaries
     boundaries = []
     for i in range(len(custom_freqs) - 1):
-        # Using the geometric mean feels better than arithmetic mean here
+        # Using the geometric mean seems better than arithmetic mean here
         b = math.sqrt((custom_freqs[i] * custom_freqs[i+1]))
         boundaries.append(b)
     boundaries.append(22050)
@@ -128,7 +128,7 @@ def play_and_extract(wav_file):
     wf = wave.open(wav_file, 'rb')
     nb_channels = wf.getnchannels()
     frame_rate = wf.getframerate()
-    nb_of_points = 128
+    nb_of_points = 48
     global first_time
     first_time = True
     global freq_ranges
@@ -197,4 +197,4 @@ def play_and_extract(wav_file):
     # close PyAudio
     pyau.terminate()
 
-play_and_extract("stress.wav")
+play_and_extract("stressmono.wav")
