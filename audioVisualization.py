@@ -140,14 +140,29 @@ def rescale_intensity(intensity_data):
 
     return i_rescaled
 
+def avg_and_rescale(freq_ranges, freqs_hertz, intensities):
+    length = len(intensities)
+    # Discard the last half, which only repeats the first half of the array
+    half_intensities = intensities[1:(length // 2) + 1]
 
-freq, intensity = aex.audio_spectrum("stress.wav", nb_of_points=512)
-print(intensity)
-freq, intensity = avg_custom_range_one_chunk(freq, intensity)
-print(freq, intensity)
-'''
-for f in intensity[6:]:
-    plt.loglog(freq, f)
-    plt.ylim(0, 220)
-    plt.show()
-'''
+    # Calculate averages
+    intens_avg = []
+
+    i = 0
+    for fr in freq_ranges:
+        domain = []
+        while freqs_hertz[i] < fr:
+            domain.append(half_intensities[i])
+
+            i += 1
+        intens_avg.append(sum(domain) / len(freq_ranges))
+        
+    
+    # Rescale    
+    # Nothing clever, found through trial and error to get a pleasing visual result
+    i_max = 1000000
+    i_rescaled = []
+    for i in intens_avg:
+        i_rescaled.append((i / i_max) * 215 + 45)
+    return i_rescaled
+    
