@@ -25,7 +25,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""
+
 ##
 # Plays a wave file
 ##
@@ -34,11 +34,8 @@ import wave
 import time
 import sys
 
-if len(sys.argv) < 2:
-    print("Plays a wave file.\n\nUsage: %s filename.wav" % sys.argv[0])
-    sys.exit(-1)
 
-wf = wave.open(sys.argv[1], 'rb')
+wf = wave.open("stress.wav", 'rb')
 
 # instantiate PyAudio
 p = pyaudio.PyAudio()
@@ -70,4 +67,3 @@ wf.close()
 
 # close PyAudio
 p.terminate()
-"""
