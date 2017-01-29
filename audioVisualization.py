@@ -29,7 +29,9 @@ import audioExtraction as aex
 import matplotlib.pyplot as plt
 import math
 
-
+##
+# Not used
+##
 def avg_linear_range(freq_data, intensity_data, nb_of_points=8):
     length = len(freq_data)
     size = length // nb_of_points
@@ -52,8 +54,9 @@ def avg_linear_range(freq_data, intensity_data, nb_of_points=8):
 def avg_custom_range(freq_data, intensity_data):
     """
     Averages intensities in 8 groups in ranges growing as 2.25^n
-    :param freq_data:
-    :param intensity_data:
+    :param
+    freq_data:
+    intensity_data:
     :return:
     """
     length = len(freq_data)
@@ -86,6 +89,41 @@ def avg_custom_range(freq_data, intensity_data):
     return custom_freqs, intens_avg
 
 
+def avg_custom_range_one_chunk(freq_data, intensity_data):
+    """
+    Averages intensities in 8 groups in ranges growing as 2.25^n
+    :param
+    freq_data:
+    intensity_data:
+    :return:
+    """
+    length = len(freq_data)
+    custom_freqs = [58, 130, 292, 657, 1478, 3325, 7482, 16834]
+
+    # Discard the last half, which only repeats the first half of the array
+    intensity_data = intensity_data[1:(length // 2) + 1]
+
+    # Calculate frequency boundaries
+    boundaries = []
+    for i in range(len(custom_freqs) - 1):
+        # Using the geometric mean feels better than arithmetic mean here
+        b = math.sqrt((custom_freqs[i] * custom_freqs[i+1]))
+        boundaries.append(b)
+    boundaries.append(22050)
+
+    # Calculate averages
+    intens_avg = []
+    i = 0
+    for bd in boundaries:
+        domain = []
+        while freq_data[i] < bd:
+            domain.append(intensity_data[i])
+            i += 1
+        intens_avg.append(sum(domain) / len(custom_freqs))
+
+    return custom_freqs, intens_avg
+
+
 def bar_plot(freq_data, intensity_data):
     plt.ylim(0, 256)
     plt.bar(freq_data, intensity_data, 1000)
@@ -94,27 +132,22 @@ def bar_plot(freq_data, intensity_data):
 
 
 def rescale_intensity(intensity_data):
-    max_global = 0
-    for f in intensity_data:
-        max_in_f = max(f)
-        if max_in_f > max_global:
-            max_global = max_in_f
-
+    # Nothing clever, found through trial and error to get a pleasing visual result
+    i_max = 1600000
     i_rescaled = []
-    for f in intensity_data:
-        f_rescaled = []
-        for i in f:
-            f_rescaled.append((i / max_global) * 200 + 55)
-        i_rescaled.append(f_rescaled)
+    for i in intensity_data:
+        i_rescaled.append((i / i_max) * 200 + 55)
 
     return i_rescaled
 
 
-freq, intensity = aex.complete_audio_spectrum("stress3.wav")
-freq, intensity = avg_custom_range(freq, intensity)
-intensity = rescale_intensity(intensity)
-
+freq, intensity = aex.audio_spectrum("stress.wav", nb_of_points=512)
+print(intensity)
+freq, intensity = avg_custom_range_one_chunk(freq, intensity)
+print(freq, intensity)
+'''
 for f in intensity[6:]:
     plt.loglog(freq, f)
     plt.ylim(0, 220)
     plt.show()
+'''
