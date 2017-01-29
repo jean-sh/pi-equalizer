@@ -160,7 +160,7 @@ def avg_and_rescale(freq_ranges, freqs_hertz, intensities):
     
     # Rescale    
     # Nothing clever, found through trial and error to get a pleasing visual result
-    i_max = 1000000
+    i_max = 100000
     i_rescaled = []
     for i in intens_avg:
         i_rescaled.append((i / i_max) * 215 + 45)
