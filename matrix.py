@@ -43,3 +43,10 @@ class Matrix(SenseHat):
         """
         for x in range(len(pixel_list)):
             self.set_pixel(x, col, pixel_list[x])
+            
+    def mode_one(self, intensity):
+        if intensity > 255:
+            intensity = 255
+        px = (intensity, intensity, intensity)
+        pixels = [px, px, px, px, px, px, px, px]
+        return pixels
