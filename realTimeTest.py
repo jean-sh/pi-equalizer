@@ -32,15 +32,16 @@ import time
 import struct
 import threading
 import multiprocessing as mp
-import queue
+import Queue
 import math
 import audioVisualization as avi
+import cv2
 from matrix import Matrix
 d = Matrix()
 d.set_rotation(270)
 
 
-def extract(data, frame_count, nb_channels, nb_of_points, q):
+def extract(data, frame_count, nb_channels):
     """
     Extracts the audio spectrum from audio data
     :param
@@ -52,25 +53,22 @@ def extract(data, frame_count, nb_channels, nb_of_points, q):
     The number of channels of the audio data
     frame_rate:
     The frame rate of the audio data
-    nb_of_points:
-    The number of points to calculate the Fast Fourier Transform
     q:
     The thread queue to put the intensities in
     """
     data = np.array(struct.unpack('{n}h'.format(n=nb_channels * frame_count), data))
-
+    windowed_data = np.multiply(data, np.hanning(len(data)))
     # Calculate the Fourier Transform coefficients
-    fft_array = np.fft.fft(data, nb_of_points)
+    dft_array = cv2.dft(np.float32(windowed_data))
+    # Return the power in each frequency
+    magnitudes = np.add(np.sqrt((dft_array*dft_array).sum(axis=1)), 10)
+    log_mag = np.log10(magnitudes)
+    print(max(log_mag))
 
-    # Calculate the power in each frequency
-    intensities = []
-    for coef in fft_array:
-        intensities.append(abs(coef))
-
-    q.put(intensities)
+    return log_mag
 
 
-def calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels, nb_of_points, q):
+def calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels):
     """
     
     :param
@@ -82,19 +80,16 @@ def calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels, nb_of
     The number of channels of the audio data
     frame_rate:
     The frame rate of the audio data
-    nb_of_points:
-    The number of points to calculate the Fast Fourier Transform
-    :q
-    The thread queue to put the frequencies in
+    :return
+    The frequencies array and the boundaries of the frequency group for displaying
     """
-    data = struct.unpack('{n}h'.format(n=nb_channels * frame_count), data)
-    data = np.array(data)
-
+    
+    data = np.array(struct.unpack('{n}h'.format(n=nb_channels * frame_count), data))
     # Calculate the Fourier Transform coefficients
-    fft_array = np.fft.fft(data, nb_of_points)
+    dft_array = cv2.dft(np.float32(data))
 
     # Calculate the frequencies associated
-    freqs = np.fft.fftfreq(len(fft_array))
+    freqs = np.fft.fftfreq(len(dft_array))
     freqs_hertz = []
     for freq in freqs:
         freqs_hertz.append(abs(freq * frame_rate))
@@ -111,14 +106,13 @@ def calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels, nb_of
         boundaries.append(b)
     boundaries.append(22050)
 
-    q.put(freqs_hertz)
-    q.put(boundaries)
+    return freqs_hertz, boundaries
 
 
 def display(freq_ranges, freq_hertz, intensities):
     intensities = avi.avg_and_rescale(freq_ranges, freq_hertz, intensities)
-    for i in range(len(freq_ranges)):
-        d.set_column(i, d.mode_one(int(intensities[i])))
+    for i in range(8):
+        d.set_column(7-i, d.mode_two(int(intensities[i])))
 
 
 ##
@@ -128,16 +122,17 @@ def play_and_extract(wav_file):
     wf = wave.open(wav_file, 'rb')
     nb_channels = wf.getnchannels()
     frame_rate = wf.getframerate()
-    nb_of_points = 48
     global first_time
     first_time = True
     global freq_ranges
     freq_ranges = []
     global freqs_hertz
     freqs_hertz = []
+    global round_nb
+    round_nb = 1
 
     # Create a queue for the extract thread and the display thread
-    q = queue.Queue()
+    q = Queue.Queue()
 
     # instantiate PyAudio
     pyau = pyaudio.PyAudio()
@@ -150,29 +145,19 @@ def play_and_extract(wav_file):
         global first_time
         global freq_ranges
         global freqs_hertz
+        global round_nb
         if first_time:
-            frequency_thread = threading.Thread(target=calculate_frequency_ranges,
-                                                args=(data, frame_count, frame_rate, nb_channels, nb_of_points, q))
-            frequency_thread.start()
-            frequency_thread.join()
-            freqs_hertz = q.get()
-            freq_ranges = q.get()
+            freqs_hertz, freq_ranges = calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels)
             first_time = False
 
-        # Create the extract thread
-        extract_thread = threading.Thread(target=extract,
-                                          args=(data, frame_count, nb_channels, nb_of_points, q))
-        extract_thread.start()
-
-        # Block until extracting is done and queue is empty
-        extract_thread.join()
-        intensities = q.get()
-        
-        # Process the extracted data for displaying
-        display_thread = threading.Thread(target=display,
-                                          args=(freq_ranges, freqs_hertz, intensities))
-        display_thread.start()
-        display_thread.join()
+        if round_nb > 10:
+            intensities = extract(data, frame_count, nb_channels)
+            # Process the extracted data for displaying
+            display_thread = threading.Thread(target=display,
+                                              args=(freq_ranges, freqs_hertz, intensities))
+            display_thread.start()
+        else:
+            round_nb += 1
         return data, pyaudio.paContinue
 
     # open stream using callback
@@ -187,7 +172,7 @@ def play_and_extract(wav_file):
 
     # wait for stream to finish
     while stream.is_active():
-        time.sleep(0.5)
+        time.sleep(0.2)
 
     # stop stream
     stream.stop_stream()
@@ -197,4 +182,4 @@ def play_and_extract(wav_file):
     # close PyAudio
     pyau.terminate()
 
-play_and_extract("stressmono.wav")
+play_and_extract("partymono.wav")
