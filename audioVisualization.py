@@ -146,10 +146,26 @@ def avg_and_rescale(freq_ranges, freqs_hertz, intensities):
     # Discard the last half, which only repeats the first half of the array
     half_intensities = intensities[1:(length // 2) + 1]
     '''
-
+    
     # Calculate averages
-    intens_avg = []
-
+    n = 0
+    
+    
+    slice1 = intensities[:7]
+    slice2 = intensities[8:15]
+    slice3 = intensities[16:31]
+    slice4 = intensities[32:63]
+    slice5 = intensities[64:127]
+    slice6 = intensities[128:255]
+    slice7 = intensities[256:511]
+    slice8 = intensities[512:]
+    intens_avg = [sum(slice1/8), sum(slice2/8),
+                  sum(slice3/16), sum(slice4/32),
+                  sum(slice5/64), sum(slice6/128),
+                  sum(slice7/256), sum(slice8/512)]
+    #print(intens_avg)
+    
+    '''
     i = 0
     for fr in freq_ranges:
         domain = []
@@ -158,13 +174,12 @@ def avg_and_rescale(freq_ranges, freqs_hertz, intensities):
 
             i += 1
         intens_avg.append(sum(domain) / len(freq_ranges))
-        
-    
+    '''
     # Rescale    
     # (temporary)
-    i_max = 100000
+    i_max = 7
     i_rescaled = []
     for i in intens_avg:
-        i_rescaled.append((i / i_max) * 225 + 30)
+        i_rescaled.append((i / i_max) * 215 + 40)
     return i_rescaled
     
