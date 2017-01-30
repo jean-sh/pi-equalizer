@@ -41,12 +41,21 @@ class Matrix(SenseHat):
         Accepts a column number and a list of 8 pixels and sets	the pixels
         in this column to the values in the list (from bottom to top)
         """
-        for x in range(len(pixel_list)):
+        for x in range(8):
             self.set_pixel(x, col, pixel_list[x])
             
     def mode_one(self, intensity):
         if intensity > 255:
             intensity = 255
-        px = (intensity, intensity, intensity)
+        px = (intensity, intensity // 2, intensity // 2)
         pixels = [px, px, px, px, px, px, px, px]
+        return pixels
+        
+    def mode_two(self, intensity):
+        if intensity > 255:
+            intensity = 255
+        pixels = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
+        n = (8 * intensity / 255)
+        for i in range(n):
+            pixels[i-n] = ((intensity // 3, intensity, intensity // 2))
         return pixels
