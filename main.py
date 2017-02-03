@@ -25,34 +25,66 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from matrix import Matrix
-
-matrix = Matrix()
-
-
-def volume_to_pixels(v):
-    px = int(v * 2.55)
-    return [px, px, px]
+import sys
+import pyaudio
+import wave
+import numpy as np
+import time
+import struct
+import threading
+import math
+import audioVisualization as auvi
+import audioExtraction as auex
+import cv2
 
 
 def main(args):
+    if len(args) != 2:
+        print("usage: ./main.py <wav file path>")
+    else:
+        wf = wave.open(args[1], 'rb')
+        nb_channels = wf.getnchannels()
+        frame_rate = wf.getframerate()
 
-    matrix.set_rotation(180)
-    matrix.low_light = True
-    i = 0
-    while i < 8:
-        matrix.set_column(i, [(100, 0, 0), (100, 0, 0), (100, 0, 0),
-        (100, 0, 0), (100, 0, 0), (100, 0, 0), (100, 0, 0), (100, 0, 0)])
-        time.sleep(1)
-        i += 1
+        # instantiate PyAudio
+        pyau = pyaudio.PyAudio()
 
-    time.sleep(2)
-    matrix.clear(volume_to_pixels(10))
-    time.sleep(1)
-    matrix.clear(volume_to_pixels(0))
+        # define callback
+        def callback(in_data, frame_count, time_info, status):
+            data = wf.readframes(frame_count)
+
+            intensities = auex.calculate_magnitudes(data, frame_count, nb_channels)
+            
+            # Process the extracted data for displaying
+            display_thread = threading.Thread(target=auvi.display_eq,
+                                              args=(intensities,))
+            display_thread.start()
+
+            return data, pyaudio.paContinue
+
+        # open stream using callback
+        stream = pyau.open(format=pyau.get_format_from_width(wf.getsampwidth()),
+                           channels=nb_channels,
+                           rate=frame_rate,
+                           output=True,
+                           stream_callback=callback)
+
+        # start the stream
+        stream.start_stream()
+
+        # wait for stream to finish
+        while stream.is_active():
+            time.sleep(0.5)
+
+        # stop stream
+        stream.stop_stream()
+        stream.close()
+        wf.close()
+
+        # close PyAudio
+        pyau.terminate()
 
     return 0
 
 if __name__ == '__main__':
-    import sys
     sys.exit(main(sys.argv))
