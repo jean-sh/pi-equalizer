@@ -7,9 +7,8 @@ Done:
 * working prototype: reads a wav file and displays the equalizer on the Sense Hat's LED display
 
 Currently working on:
-* restructuring the code (it's in realTimeTests.py right now)
 * performance improvements
-* making the visualization better
+* improving the display
 
 Later:
 * automatic conversion to accept most audio formats: mp3, aac, ogg, etc.
