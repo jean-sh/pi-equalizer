@@ -25,132 +25,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import audioExtraction as aex
-import matplotlib.pyplot as plt
-import math
+from matrix import Matrix
 
-##
-# Not used
-##
-def avg_linear_range(freq_data, intensity_data, nb_of_points=8):
-    length = len(freq_data)
-    size = length // nb_of_points
-
-    freq_avg = []
-    for n in range(nb_of_points):
-        f = sum(freq_data[n*size:(n+1)*size]) // size
-        freq_avg.append(f)
-
-    intens_avg = []
-    for j, frame_intensities in enumerate(intensity_data):
-        frame_avg = []
-        for n in range(nb_of_points):
-            i = sum(frame_intensities[n*size:(n+1)*size]) // size
-            frame_avg.append(i)
-        intens_avg.append(frame_avg)
-    return freq_avg, intens_avg
+display = Matrix()
+display.set_rotation(270)
 
 
-def avg_custom_range(freq_data, intensity_data):
-    """
-    Averages intensities in 8 groups in ranges growing as 2.25^n
-    :param
-    freq_data:
-    intensity_data:
-    :return:
-    """
-    length = len(freq_data)
-    custom_freqs = [58, 130, 292, 657, 1478, 3325, 7482, 16834]
-
-    # Discard the last half, which only repeats the first half of the array
-    for idx, f in enumerate(intensity_data):
-        intensity_data[idx] = f[1:(length // 2) + 1]
-
-    # Calculate frequency boundaries
-    boundaries = []
-    for i in range(len(custom_freqs) - 1):
-        b = math.sqrt((custom_freqs[i] * custom_freqs[i+1]))
-        boundaries.append(b)
-    boundaries.append(22050)
-
-    # Calculate averages
-    intens_avg = []
-    for frame in intensity_data:
-        frame_avg = []
-        for bd in boundaries:
-            domain = []
-            i = 0
-            while freq_data[i] < bd:
-                domain.append(frame[i])
-                i += 1
-            frame_avg.append(sum(domain) / len(custom_freqs))
-        intens_avg.append(frame_avg)
-
-    return custom_freqs, intens_avg
-
-
-def avg_custom_range_one_chunk(freq_data, intensity_data):
-    """
-    Averages intensities in 8 groups in ranges growing as 2.25^n
-    :param
-    freq_data:
-    intensity_data:
-    :return:
-    """
-    length = len(freq_data)
-    custom_freqs = [58, 130, 292, 657, 1478, 3325, 7482, 16834]
-
-    # Discard the last half, which only repeats the first half of the array
-    intensity_data = intensity_data[1:(length // 2) + 1]
-
-    # Calculate frequency boundaries
-    boundaries = []
-    for i in range(len(custom_freqs) - 1):
-        # Using the geometric mean feels better than arithmetic mean here
-        b = math.sqrt((custom_freqs[i] * custom_freqs[i+1]))
-        boundaries.append(b)
-    boundaries.append(22050)
-
-    # Calculate averages
-    intens_avg = []
-    i = 0
-    for bd in boundaries:
-        domain = []
-        while freq_data[i] < bd:
-            domain.append(intensity_data[i])
-            i += 1
-        intens_avg.append(sum(domain) / len(custom_freqs))
-
-    return custom_freqs, intens_avg
-
-
-def bar_plot(freq_data, intensity_data):
-    plt.ylim(0, 256)
-    plt.bar(freq_data, intensity_data, 1000)
-    #plt.yscale("symlog")
-    plt.show()
-
-
-def rescale_intensity(intensity_data):
-    # Nothing clever, found through trial and error to get a pleasing visual result
-    i_max = 100000
-    i_rescaled = []
-    for i in intensity_data:
-        i_rescaled.append((i / i_max) * 200 + 55)
-
-    return i_rescaled
-
-def avg_and_rescale(freq_ranges, freqs_hertz, intensities):
-    ''' What is this for again?
-    length = len(intensities)
-    # Discard the last half, which only repeats the first half of the array
-    half_intensities = intensities[1:(length // 2) + 1]
-    '''
-    
-    # Calculate averages
-    n = 0
-    
-    
+def avg_and_rescale(intensities):   
+    # Custom slices following a logarithmic progression
+    # that is closer to human hearing 
     slice1 = intensities[:7]
     slice2 = intensities[8:15]
     slice3 = intensities[16:31]
@@ -159,27 +42,21 @@ def avg_and_rescale(freq_ranges, freqs_hertz, intensities):
     slice6 = intensities[128:255]
     slice7 = intensities[256:511]
     slice8 = intensities[512:]
+    
     intens_avg = [sum(slice1/8), sum(slice2/8),
                   sum(slice3/16), sum(slice4/32),
                   sum(slice5/64), sum(slice6/128),
                   sum(slice7/256), sum(slice8/512)]
-    #print(intens_avg)
     
-    '''
-    i = 0
-    for fr in freq_ranges:
-        domain = []
-        while freqs_hertz[i] < fr:
-            domain.append(intensities[i])
-
-            i += 1
-        intens_avg.append(sum(domain) / len(freq_ranges))
-    '''
-    # Rescale    
-    # (temporary)
-    i_max = 7
+    # Rescale
+    i_max = 6
     i_rescaled = []
     for i in intens_avg:
-        i_rescaled.append((i / i_max) * 215 + 40)
+        i_rescaled.append((i / i_max) * 255 + 0)
     return i_rescaled
     
+
+def display_eq(intensities):
+    intensities = avg_and_rescale(intensities)
+    for i in range(8):
+        display.set_column(7-i, display.mode_two(int(intensities[i])))
