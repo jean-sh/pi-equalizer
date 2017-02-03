@@ -1,16 +1,16 @@
 # piEqualizer
 An audio visualizer for the Raspberry Pi Sense Hat's LED display, written in Python.
 
-Work in progress, not functional yet.
+Work in progress.
 
 Done:
-* function to update 1 column of LEDs at a time
-* extracting audio data to create the audio spectrum
-* making the spectrum into meaningful values (volume over 8 frequency ranges)
-* feeding the values to the LEDs for displaying
+* working prototype: reads a wav file and displays the equalizer on the Sense Hat's LED display
 
 Currently working on:
-* playing audio and extracting data in real time
+* restructuring the code (it's in realTimeTests.py right now)
+* performance improvements
+* making the visualization better
 
 Later:
-* making the display eye-pleasing
+* automatic conversion to accept most audio formats: mp3, aac, ogg, etc.
+* selecting between different visualization modes with the Sense Hat's joystick
