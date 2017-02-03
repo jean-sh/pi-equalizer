@@ -57,5 +57,5 @@ class Matrix(SenseHat):
         pixels = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
         n = (8 * intensity / 255)
         for i in range(n):
-            pixels[i-n] = ((intensity // 3, intensity, intensity // 2))
+            pixels[i-n] = ((intensity, intensity // 3, intensity // 2))
         return pixels
