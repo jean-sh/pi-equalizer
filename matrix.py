@@ -44,12 +44,14 @@ class Matrix(SenseHat):
         for x in range(8):
             self.set_pixel(x, col, pixel_list[x])
             
+            
     def mode_one(self, intensity):
         if intensity > 255:
             intensity = 255
-        px = (intensity, intensity // 2, intensity // 2)
+        px = [intensity, intensity // 2, intensity // 2]
         pixels = [px, px, px, px, px, px, px, px]
         return pixels
+        
         
     def mode_two(self, intensity):
         if intensity > 255:
@@ -57,5 +59,29 @@ class Matrix(SenseHat):
         pixels = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
         n = (8 * intensity / 255)
         for i in range(n):
-            pixels[i-n] = ((intensity, intensity // 3, intensity // 2))
+            pixels[i-n] = [intensity, intensity // 3, intensity // 2]
         return pixels
+        
+        
+    def mode_three(self, intensity):
+        if intensity > 255:
+            intensity = 255
+        pixels = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
+        if intensity > 32:
+            pixels[7] = [intensity, intensity // 3, intensity // 2]
+        if intensity > 64:
+            pixels[6] = [intensity, intensity // 3, intensity // 2]
+        if intensity > 96:
+            pixels[5] = [intensity, intensity // 3, intensity // 2]
+        if intensity > 128:
+            pixels[4] = [intensity, intensity // 3, intensity // 2]
+        if intensity > 160:
+            pixels[3] = [intensity, intensity // 3, intensity // 2]
+        if intensity > 192:
+            pixels[2] = [intensity, intensity // 3, intensity // 2]
+        if intensity > 224:
+            pixels[1] = [intensity, intensity // 3, intensity // 2]
+        if intensity == 255:
+            pixels[0] = [intensity, intensity // 3, intensity // 2]
+        return pixels
+            
