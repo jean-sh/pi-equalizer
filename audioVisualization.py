@@ -47,16 +47,15 @@ def avg_and_rescale(intensities):
                   sum(slice3/16), sum(slice4/32),
                   sum(slice5/64), sum(slice6/128),
                   sum(slice7/256), sum(slice8/512)]
-    
     # Rescale
     i_max = 6
     i_rescaled = []
     for i in intens_avg:
-        i_rescaled.append((i / i_max) * 255 + 0)
+        i_rescaled.append((i / i_max) * 255)
     return i_rescaled
     
 
 def display_eq(intensities):
     intensities = avg_and_rescale(intensities)
     for i in range(8):
-        display.set_column(7-i, display.mode_two(int(intensities[i])))
+        display.set_column(7-i, display.mode_three(int(intensities[i])))
