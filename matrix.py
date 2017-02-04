@@ -85,3 +85,127 @@ class Matrix(SenseHat):
             pixels[0] = [intensity, intensity // 3, intensity // 2]
         return pixels
             
+            
+    def generate_display_frame(self, magnitudes):
+        '''
+        Returns a 64 pixel list representing one frame
+        of the equalizer to display according to
+        the list of magnitudes it receives
+        '''
+        for mag in magnitudes:
+            if mag > 255:
+                mag = 255
+        zero_p = [0, 0, 0]
+        pixels = []
+                
+        for mag in magnitudes:
+            full_p = [mag, mag // 3, mag // 2]
+            half_p = [mag // 2, mag // 4, mag // 3]
+            if mag > 127:
+                if mag > 191:
+                    if mag > 223:
+                        if mag > 239:
+                            for i in range(8):
+                                #print("> 239")
+                                pixels.append(full_p)
+                        else:
+                            #print("> 223")
+                            for i in range(7):
+                                pixels.append(full_p)
+                            pixels.append(half_p)
+                    elif mag > 207:
+                        #print("> 207")
+                        for i in range(7):
+                            pixels.append(full_p)
+                        pixels.append(zero_p)
+                    else:
+                        #print("> 191")
+                        for i in range(6):
+                            pixels.append(full_p)
+                        pixels.append(half_p)
+                        pixels.append(zero_p)
+                elif mag > 159:
+                    if mag > 175:
+                        #print("> 175")
+                        for i in range(6):
+                            pixels.append(full_p)
+                        pixels.append(zero_p)
+                        pixels.append(zero_p)
+                    else:
+                        #print("> 159")
+                        for i in range(5):
+                            pixels.append(full_p)
+                        pixels.append(half_p)
+                        pixels.append(zero_p)
+                        pixels.append(zero_p)
+                elif mag > 143:
+                    #print("> 143")
+                    for i in range(5):
+                        pixels.append(full_p)
+                    pixels.append(zero_p)
+                    pixels.append(zero_p)
+                    pixels.append(zero_p)
+                else: # mag > 127
+                    for i in range(4):
+                        pixels.append(full_p)
+                    pixels.append(half_p)
+                    pixels.append(zero_p)
+                    pixels.append(zero_p)
+                    pixels.append(zero_p)
+                    
+            elif mag > 63:
+                if mag > 95:
+                    if mag > 111:
+                        #print("> 111")
+                        for i in range(4):
+                            pixels.append(full_p)
+                        pixels.append(zero_p)
+                        pixels.append(zero_p)
+                        pixels.append(zero_p)
+                        pixels.append(zero_p)
+                    else: # mag > 95
+                        #print("> 95")
+                        pixels.append(full_p)
+                        pixels.append(full_p)
+                        pixels.append(full_p)
+                        pixels.append(half_p)
+                        for i in range(4):
+                            pixels.append(zero_p)
+                elif mag > 79:
+                    #print("> 79")
+                    pixels.append(full_p)
+                    pixels.append(full_p)
+                    pixels.append(full_p)
+                    for i in range(5):
+                        pixels.append(zero_p)
+                else: # mag > 63
+                    #rint("> 63")
+                    pixels.append(full_p)
+                    pixels.append(full_p)
+                    pixels.append(half_p)
+                    for i in range(5):
+                        pixels.append(zero_p)
+            elif mag > 31:
+                if mag > 47:
+                    #print("> 47")
+                    pixels.append(full_p)
+                    pixels.append(full_p)
+                    for i in range(6):
+                        pixels.append(zero_p)
+                else: # mag > 31:
+                    #print("> 31")
+                    pixels.append(full_p)
+                    pixels.append(half_p)
+                    for i in range(6):
+                        pixels.append(zero_p)
+            elif mag > 15:
+                #print("> 15")
+                pixels.append(full_p)
+                for i in range(7):
+                    pixels.append(zero_p)
+            else:
+                #print("> 0")
+                pixels.append(half_p)
+                for i in range(7):
+                    pixels.append(zero_p)
+        return pixels
