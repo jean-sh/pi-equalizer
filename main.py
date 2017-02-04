@@ -57,7 +57,7 @@ def main(args):
             magnitudes = pool.apply(auex.calculate_magnitudes, (data, frame_count, nb_channels))
             
             # Displaying the eq
-            auvi.display_eq(magnitudes)
+            auvi.display_64(magnitudes)
 
             return data, pyaudio.paContinue
 
