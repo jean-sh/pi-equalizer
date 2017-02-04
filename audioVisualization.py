@@ -28,20 +28,20 @@
 from matrix import Matrix
 
 display = Matrix()
-display.set_rotation(270)
+display.set_rotation(90)
 
 
-def avg_and_rescale(intensities):   
+def avg_and_rescale(magnitudes):   
     # Custom slices following a logarithmic progression
     # that is closer to human hearing 
-    slice1 = intensities[:7]
-    slice2 = intensities[8:15]
-    slice3 = intensities[16:31]
-    slice4 = intensities[32:63]
-    slice5 = intensities[64:127]
-    slice6 = intensities[128:255]
-    slice7 = intensities[256:511]
-    slice8 = intensities[512:]
+    slice1 = magnitudes[:7]
+    slice2 = magnitudes[8:15]
+    slice3 = magnitudes[16:31]
+    slice4 = magnitudes[32:63]
+    slice5 = magnitudes[64:127]
+    slice6 = magnitudes[128:255]
+    slice7 = magnitudes[256:511]
+    slice8 = magnitudes[512:]
     
     intens_avg = [sum(slice1/8), sum(slice2/8),
                   sum(slice3/16), sum(slice4/32),
@@ -55,7 +55,12 @@ def avg_and_rescale(intensities):
     return i_rescaled
     
 
-def display_eq(intensities):
-    intensities = avg_and_rescale(intensities)
+def display_eq(magnitudes):
+    magnitudes = avg_and_rescale(magnitudes)
     for i in range(8):
-        display.set_column(7-i, display.mode_three(int(intensities[i])))
+        display.set_column(7-i, display.mode_three(int(magnitudes[i])))
+
+def display_64(magnitudes):
+    float_magnitudes = avg_and_rescale(magnitudes)
+    int_magnitudes = [int(mag) for mag in float_magnitudes]
+    display.set_pixels(display.generate_display_frame(int_magnitudes))
