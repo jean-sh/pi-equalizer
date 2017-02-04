@@ -30,18 +30,18 @@ import pyaudio
 import wave
 import numpy as np
 import time
-import struct
-import threading
+import multiprocessing as mp
 import math
 import audioVisualization as auvi
 import audioExtraction as auex
-import cv2
 
 
 def main(args):
     if len(args) != 2:
         print("usage: ./main.py <wav file path>")
     else:
+        pool = mp.Pool(processes=2)
+        
         wf = wave.open(args[1], 'rb')
         nb_channels = wf.getnchannels()
         frame_rate = wf.getframerate()
@@ -52,13 +52,12 @@ def main(args):
         # define callback
         def callback(in_data, frame_count, time_info, status):
             data = wf.readframes(frame_count)
-
-            intensities = auex.calculate_magnitudes(data, frame_count, nb_channels)
             
-            # Process the extracted data for displaying
-            display_thread = threading.Thread(target=auvi.display_eq,
-                                              args=(intensities,))
-            display_thread.start()
+            # Calculating magnitudes
+            magnitudes = pool.apply(auex.calculate_magnitudes, (data, frame_count, nb_channels))
+            
+            # Displaying the eq
+            auvi.display_eq(magnitudes)
 
             return data, pyaudio.paContinue
 
