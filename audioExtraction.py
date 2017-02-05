@@ -28,12 +28,11 @@
 import numpy as np
 import cv2
 import struct
-import math
 
 
 def calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels):
     """
-    TODO
+    Unused
     """
     
     data = np.array(struct.unpack('{n}h'.format(n=nb_channels * frame_count), data))
@@ -54,7 +53,7 @@ def calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels):
     boundaries = []
     for i in range(len(custom_freqs) - 1):
         # Using the geometric mean seems better than arithmetic mean here
-        b = math.sqrt((custom_freqs[i] * custom_freqs[i+1]))
+        b = np.sqrt((custom_freqs[i] * custom_freqs[i+1]))
         boundaries.append(b)
     boundaries.append(22050)
 
@@ -65,12 +64,17 @@ def calculate_magnitudes(data, frame_count, nb_channels):
     """
     TODO
     """
-    data = np.array(struct.unpack('{n}h'.format(n=nb_channels * frame_count), data))
+    if nb_channels == 2:    # Strip every other sample point to keep only one channel
+        data = np.array(struct.unpack('{n}h'.format(n=nb_channels * frame_count), data))[::2]
+    else:
+        data = np.array(struct.unpack('{n}h'.format(n=nb_channels * frame_count), data))
+        
     windowed_data = np.multiply(data, np.hanning(len(data)))
+    
     # Calculate the Fourier Transform coefficients
     dft_array = cv2.dft(np.float32(windowed_data))
+    
     # Return the power in each frequency
     magnitudes = np.add(np.sqrt((dft_array*dft_array).sum(axis=1)), 10)
     log_mag = np.log10(magnitudes)
-
     return log_mag
