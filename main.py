@@ -31,6 +31,7 @@ import wave
 import numpy as np
 import time
 import multiprocessing as mp
+import Queue
 import math
 import audioVisualization as auvi
 import audioExtraction as auex
@@ -40,7 +41,8 @@ def main(args):
     if len(args) != 2:
         print("usage: ./main.py <wav file path>")
     else:
-        pool = mp.Pool(processes=2)
+        pool = mp.Pool(processes=4)
+        q = Queue.Queue()
         
         wf = wave.open(args[1], 'rb')
         nb_channels = wf.getnchannels()
@@ -52,14 +54,13 @@ def main(args):
         # define callback
         def callback(in_data, frame_count, time_info, status):
             data = wf.readframes(frame_count)
+            try:
+                q.put(data)
+            except:
+                print("error putting data")
             
-            # Calculating magnitudes
-            magnitudes = pool.apply(auex.calculate_magnitudes, (data, frame_count, nb_channels))
-            
-            # Displaying the eq
-            auvi.display_64(magnitudes)
-
             return data, pyaudio.paContinue
+
 
         # open stream using callback
         stream = pyau.open(format=pyau.get_format_from_width(wf.getsampwidth()),
@@ -67,14 +68,20 @@ def main(args):
                            rate=frame_rate,
                            output=True,
                            stream_callback=callback)
-
+      
+        
         # start the stream
-        stream.start_stream()
-
-        # wait for stream to finish
+        pool.apply_async(stream.start_stream)
+        
         while stream.is_active():
-            time.sleep(0.5)
-
+            data = q.get(0.1)
+            frame_count = q.get(0.1)
+            try:
+                magnitudes = pool.apply(auex.calculate_magnitudes, (data, 1024, nb_channels))
+                pool.apply_async(auvi.display_64, (magnitudes,))
+            except:
+                print("couldn't calculate and display")
+        
         # stop stream
         stream.stop_stream()
         stream.close()
