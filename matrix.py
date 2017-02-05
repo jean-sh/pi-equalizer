@@ -26,7 +26,7 @@
 # SOFTWARE.
 
 from sense_hat import SenseHat
-
+import time
 
 class Matrix(SenseHat):
     """
@@ -91,6 +91,8 @@ class Matrix(SenseHat):
         Returns a 64 pixel list representing one frame
         of the equalizer to display according to
         the list of magnitudes it receives
+        
+        It's ugly but quite fast
         '''
         for mag in magnitudes:
             if mag > 255:
@@ -99,8 +101,8 @@ class Matrix(SenseHat):
         pixels = []
                 
         for mag in magnitudes:
-            full_p = [mag, mag // 3, mag // 2]
-            half_p = [mag // 2, mag // 4, mag // 3]
+            full_p = [mag // 3, mag // 2, mag]
+            half_p = [mag // 4, mag // 3, mag // 2]
             if mag > 127:
                 if mag > 191:
                     if mag > 223:
@@ -208,4 +210,5 @@ class Matrix(SenseHat):
                 pixels.append(half_p)
                 for i in range(7):
                     pixels.append(zero_p)
+
         return pixels
