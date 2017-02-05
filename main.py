@@ -56,7 +56,6 @@ def main(args):
             data = wf.readframes(frame_count)
             try:
                 q.put_nowait(data)
-                print("put data")
             except:
                 print("error putting data")
             
@@ -77,10 +76,8 @@ def main(args):
         # Process the data and display it while the stream is running
         while stream.is_active():
             while q.qsize() < 30: # This creates a delay so that audio and display are synchronized
-                print(q.qsize())
                 time.sleep(0.05)
             data = q.get(0.1)
-            print("get data")
 
             magnitudes = pool.apply(auex.calculate_magnitudes, (data, 1024, nb_channels))
             pool.apply_async(auvi.display_64, (magnitudes,))
