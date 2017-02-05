@@ -4,7 +4,7 @@
 piEqualizer plays a wav file while displaying the equalizer on the Sense Hat's LED display.
 
 ### Installing
-You will need a Raspberry Pi (I only tested it on the Pi 3) and the Pi's ![Sense Hat](https://www.raspberrypi.org/products/sense-hat/).
+You will need a Raspberry Pi (I only tested it on the Pi 3) and the Pi's [Sense Hat](https://www.raspberrypi.org/products/sense-hat/).
 
 piEqualizer uses NumPy, OpenCV and pyAudio which you can install with `pip`.
 
