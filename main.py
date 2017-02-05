@@ -41,8 +41,8 @@ def main(args):
     if len(args) != 2:
         print("usage: ./main.py <wav file path>")
     else:
-        pool = mp.Pool(processes=4)
-        q = Queue.Queue()
+        pool = mp.Pool(processes=3)
+        q = Queue.Queue(100)
         
         wf = wave.open(args[1], 'rb')
         nb_channels = wf.getnchannels()
@@ -55,7 +55,8 @@ def main(args):
         def callback(in_data, frame_count, time_info, status):
             data = wf.readframes(frame_count)
             try:
-                q.put(data)
+                q.put_nowait(data)
+                print("put data")
             except:
                 print("error putting data")
             
@@ -73,14 +74,17 @@ def main(args):
         # start the stream
         pool.apply_async(stream.start_stream)
         
+        # Process the data and display it while the stream is running
         while stream.is_active():
+            while q.qsize() < 30: # This creates a delay so that audio and display are synchronized
+                print(q.qsize())
+                time.sleep(0.05)
             data = q.get(0.1)
-            frame_count = q.get(0.1)
-            try:
-                magnitudes = pool.apply(auex.calculate_magnitudes, (data, 1024, nb_channels))
-                pool.apply_async(auvi.display_64, (magnitudes,))
-            except:
-                print("couldn't calculate and display")
+            print("get data")
+
+            magnitudes = pool.apply(auex.calculate_magnitudes, (data, 1024, nb_channels))
+            pool.apply_async(auvi.display_64, (magnitudes,))
+
         
         # stop stream
         stream.stop_stream()
