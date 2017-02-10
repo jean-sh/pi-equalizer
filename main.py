@@ -27,7 +27,7 @@
 
 import sys
 import os
-from subprocess import call
+import subprocess as sp
 import pyaudio
 import wave
 import numpy as np
@@ -41,7 +41,7 @@ import audioExtraction as auex
 
 def main(args):
     if len(args) != 2:
-        print("usage: ./main.py <wav file path>")
+        print("usage: ./main.py <audio file path>")
     else:
         tmp_file_exists = False
         path, filename = os.path.split(args[1])
@@ -54,8 +54,8 @@ def main(args):
             pieq_tmp = os.path.expanduser("~") + "/.pieq_tmp/"
             wavpath = pieq_tmp + filename + ".wav"
             print("Decompressing...")
-            call(["mkdir", "-p", pieq_tmp])
-            call(["ffmpeg", "-i", args[1], wavpath], stdout=FNULL)
+            sp.call(["mkdir", "-p", pieq_tmp])
+            sp.call(["ffmpeg", "-i", args[1], wavpath], stdout=FNULL, stderr=sp.STDOUT)
             tmp_file_exists = True
         else:
             filepath = args[1]
@@ -110,8 +110,10 @@ def main(args):
            
             # close PyAudio
             pyau.terminate()
+            
         except KeyboardInterrupt:
             print("Stopping...")
+            q.close()
             pool.terminate()
         finally:
             # Delete temp wav file if necessary
