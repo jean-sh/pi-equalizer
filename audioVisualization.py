@@ -63,5 +63,5 @@ def display_eq(magnitudes):
 def display_64(magnitudes):
     float_magnitudes = avg_and_rescale(magnitudes)
     int_magnitudes = [int(mag) for mag in float_magnitudes]
-    display.set_pixels(display.generate_display_frame(int_magnitudes))
+    display.set_pixels(display.display_mode_2(int_magnitudes))
     

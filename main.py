@@ -26,6 +26,8 @@
 # SOFTWARE.
 
 import sys
+import os
+from subprocess import call
 import pyaudio
 import wave
 import numpy as np
@@ -41,56 +43,81 @@ def main(args):
     if len(args) != 2:
         print("usage: ./main.py <wav file path>")
     else:
-        pool = mp.Pool(processes=3)
-        q = Queue.Queue(100)
+        tmp_file_exists = False
+        path, filename = os.path.split(args[1])
+        filename, extension = os.path.splitext(filename)
+        filepath = ""
         
-        wf = wave.open(args[1], 'rb')
-        nb_channels = wf.getnchannels()
-        frame_rate = wf.getframerate()
-
-        # instantiate PyAudio
-        pyau = pyaudio.PyAudio()
-
-        # define callback
-        def callback(in_data, frame_count, time_info, status):
-            data = wf.readframes(frame_count)
-            try:
-                q.put_nowait(data)
-            except:
-                print("error putting data")
+        # Convert compressed formats to a temp wav file
+        if extension != ".wav":
+            FNULL = open(os.devnull, "w")
+            pieq_tmp = os.path.expanduser("~") + "/.pieq_tmp/"
+            wavpath = pieq_tmp + filename + ".wav"
+            print("Decompressing...")
+            call(["mkdir", "-p", pieq_tmp])
+            call(["ffmpeg", "-i", args[1], wavpath], stdout=FNULL)
+            tmp_file_exists = True
+        else:
+            filepath = args[1]
             
-            return data, pyaudio.paContinue
+        try: # Handle KeyboardInterrupt exception
+            pool = mp.Pool(processes=3)
+            q = Queue.Queue(100)
+            
+            wf = wave.open(wavpath, 'rb')
+            nb_channels = wf.getnchannels()
+            frame_rate = wf.getframerate()
+
+            # instantiate PyAudio
+            pyau = pyaudio.PyAudio()
+
+            # define callback
+            def callback(in_data, frame_count, time_info, status):
+                data = wf.readframes(frame_count)
+                try:
+                    q.put_nowait(data)
+                except:
+                    print("error putting data")
+                
+                return data, pyaudio.paContinue
 
 
-        # open stream using callback
-        stream = pyau.open(format=pyau.get_format_from_width(wf.getsampwidth()),
-                           channels=nb_channels,
-                           rate=frame_rate,
-                           output=True,
-                           stream_callback=callback)
-      
-        
-        # start the stream
-        pool.apply_async(stream.start_stream)
-        
-        # Process the data and display it while the stream is running
-        while stream.is_active():
-            while q.qsize() < 30: # This creates a delay so that audio and display are synchronized
-                time.sleep(0.05)
-            data = q.get(0.1)
+            # open stream using callback
+            stream = pyau.open(format=pyau.get_format_from_width(wf.getsampwidth()),
+                               channels=nb_channels,
+                               rate=frame_rate,
+                               output=True,
+                               stream_callback=callback)
+          
+            
+            # start the stream
+            pool.apply_async(stream.start_stream)
+            
+            # Process the data and display it while the stream is running
+            while stream.is_active():
+                while q.qsize() < 30: # This creates a delay so that audio and display are synchronized
+                    time.sleep(0.05)
+                data = q.get(0.1)
 
-            magnitudes = pool.apply(auex.calculate_magnitudes, (data, 1024, nb_channels))
-            pool.apply_async(auvi.display_64, (magnitudes,))
+                magnitudes = pool.apply(auex.calculate_magnitudes, (data, 1024, nb_channels))
+                pool.apply_async(auvi.display_64, (magnitudes,))
 
-        
-        # stop stream
-        stream.stop_stream()
-        stream.close()
-        wf.close()
-
-        # close PyAudio
-        pyau.terminate()
-
+            
+            # stop stream
+            stream.stop_stream()
+            stream.close()
+            wf.close()
+           
+            # close PyAudio
+            pyau.terminate()
+        except KeyboardInterrupt:
+            print("Stopping...")
+            pool.terminate()
+        finally:
+            # Delete temp wav file if necessary
+            if tmp_file_exists:
+                os.remove(wavpath)
+                
     return 0
 
 if __name__ == '__main__':

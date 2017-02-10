@@ -209,7 +209,6 @@ class Matrix(SenseHat):
                             for i in range(7):
                                 pixels.append(rainbow[i])
                             pixels.append([c // 2 for c in rainbow[i]])
-                            print(i)
                     elif mag > 207:
                         #print("> 207")
                         for i in range(7):
