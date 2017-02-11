@@ -48,7 +48,7 @@ def avg_and_rescale(magnitudes):
                   sum(slice5/64), sum(slice6/128),
                   sum(slice7/256), sum(slice8/512)]
     # Rescale
-    i_max = 6
+    i_max = 6.1
     i_rescaled = []
     for i in intens_avg:
         i_rescaled.append((i / i_max) * 255)
@@ -63,5 +63,7 @@ def display_eq(magnitudes):
 def display_64(magnitudes):
     float_magnitudes = avg_and_rescale(magnitudes)
     int_magnitudes = [int(mag) for mag in float_magnitudes]
-    display.set_pixels(display.display_mode_2(int_magnitudes))
+    display.set_pixels(display.display_mode_3(int_magnitudes))
     
+def clear_display():
+    display.clear()
