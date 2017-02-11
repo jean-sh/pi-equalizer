@@ -46,21 +46,25 @@ def main(args):
         path, filename = os.path.split(args[1])
         filename, extension = os.path.splitext(filename)
         
-        # Convert compressed formats to a temp wav file
-        if extension != ".wav":
-            FNULL = open(os.devnull, "w")
-            pieq_tmp = os.path.expanduser("~") + "/.pieq_tmp/"
-            wavpath = pieq_tmp + filename + ".wav"
-            print("Decompressing...")
-            sp.call(["mkdir", "-p", pieq_tmp])
-            sp.call(["ffmpeg", "-i", args[1], wavpath], stdout=FNULL, stderr=sp.STDOUT)
-            tmp_file_exists = True
-        else:
-            wavpath = args[1]
-            
         try: # Handle KeyboardInterrupt exception
+            
+            # Convert compressed formats to a temp wav file
+            if extension != ".wav":
+                FNULL = open(os.devnull, "w")
+                pieq_tmp = os.path.expanduser("~") + "/.pieq_tmp/"
+                wavpath = pieq_tmp + filename + ".wav"
+                
+                if not os.path.isfile(wavpath):
+                    print("Decompressing...")
+                    sp.call(["mkdir", "-p", pieq_tmp])
+                    sp.call(["ffmpeg", "-i", args[1], wavpath], stdout=FNULL, stderr=sp.STDOUT)
+                    tmp_file_exists = True
+            else:
+                wavpath = args[1]
+            
+        
             pool = mp.Pool(processes=3)
-            q = mp.Queue(100)
+            q = mp.Queue(64)
             
             wf = wave.open(wavpath, 'rb')
             nb_channels = wf.getnchannels()
@@ -75,7 +79,7 @@ def main(args):
                 try:
                     q.put_nowait(data)
                 except:
-                    print("error putting data")
+                    pass
                 
                 return data, pyaudio.paContinue
 
@@ -93,8 +97,10 @@ def main(args):
             
             # Process the data and display it while the stream is running
             while stream.is_active():
-                while q.qsize() < 30: # This creates a delay so that audio and display are synchronized
+                # This creates a delay so that audio and display are synchronized
+                while q.qsize() < 30: 
                     time.sleep(0.05)
+                    break
                 data = q.get(0.1)
 
                 magnitudes = pool.apply(auex.calculate_magnitudes, (data, 1024, nb_channels))
@@ -111,9 +117,9 @@ def main(args):
             
         except KeyboardInterrupt:
             print("Stopping...")
+        finally:
             q.close()
             pool.terminate()
-        finally:
             auvi.clear_display()
             # Delete temp wav file if necessary
             if tmp_file_exists:
