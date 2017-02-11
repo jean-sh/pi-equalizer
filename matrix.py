@@ -27,6 +27,7 @@
 
 from sense_hat import SenseHat
 import time
+import numpy as np
 
 class Matrix(SenseHat):
     """
@@ -35,6 +36,18 @@ class Matrix(SenseHat):
 
     def __init__(self):
         SenseHat.__init__(self)
+        
+        # Color definitions:
+        self.black = [0, 0, 0]
+        self.indigo = [55, 30, 128]
+        self.electric = [30, 70, 128]
+        self.emerald = [50, 210, 175]
+        self.lime = [90, 255, 200]
+        self.yellow = [220, 220, 100]
+        self.orange = [255, 180, 100]
+        self.red = [255, 140, 140]
+        self.white = [255, 255, 255]
+        self.rainbow = [self.indigo, self.electric, self.emerald, self.lime, self.yellow, self.orange, self.red, self.white]
 
     def set_column(self, col, pixel_list):
         """
@@ -183,16 +196,7 @@ class Matrix(SenseHat):
         for mag in magnitudes:
             if mag > 255:
                 mag = 255
-        black = [0, 0, 0]
-        indigo = [110, 60, 255]
-        electric = [60, 140, 255]
-        emerald = [60, 240, 200]
-        lime = [90, 255, 200]
-        yellow = [220, 220, 100]
-        orange = [255, 180, 100]
-        red = [255, 140, 140]
-        white = [255, 255, 255]
-        rainbow = [indigo, electric, emerald, lime, yellow, orange, red, white]
+        
         
         pixels = []
 
@@ -203,141 +207,157 @@ class Matrix(SenseHat):
                         if mag > 239:
                             for i in range(8):
                                 #print("> 239")
-                                pixels.append(rainbow[i])
+                                pixels.append(self.rainbow[i])
                         else:
                             #print("> 223")
                             for i in range(7):
-                                pixels.append(rainbow[i])
-                            pixels.append([c // 2 for c in rainbow[i]])
+                                pixels.append(self.rainbow[i])
+                            pixels.append([c // 2 for c in self.rainbow[i]])
                     elif mag > 207:
                         #print("> 207")
                         for i in range(7):
-                            pixels.append(rainbow[i])
-                        pixels.append(black)
+                            pixels.append(self.rainbow[i])
+                        pixels.append(self.black)
                     else:
                         #print("> 191")
                         for i in range(6):
-                            pixels.append(rainbow[i])
-                        pixels.append([c // 2 for c in rainbow[i]])
-                        pixels.append(black)
+                            pixels.append(self.rainbow[i])
+                        pixels.append([c // 2 for c in self.rainbow[i]])
+                        pixels.append(self.black)
                 elif mag > 159:
                     if mag > 175:
                         #print("> 175")
                         for i in range(6):
-                            pixels.append(rainbow[i])
-                        pixels.append(black)
-                        pixels.append(black)
+                            pixels.append(self.rainbow[i])
+                        pixels.append(self.black)
+                        pixels.append(self.black)
                     else:
                         #print("> 159")
                         for i in range(5):
-                            pixels.append(rainbow[i])
-                        pixels.append([c // 2 for c in rainbow[i]])
-                        pixels.append(black)
-                        pixels.append(black)
+                            pixels.append(self.rainbow[i])
+                        pixels.append([c // 2 for c in self.rainbow[i]])
+                        pixels.append(self.black)
+                        pixels.append(self.black)
                 elif mag > 143:
                     #print("> 143")
                     for i in range(5):
-                        pixels.append(rainbow[i])
-                    pixels.append(black)
-                    pixels.append(black)
-                    pixels.append(black)
+                        pixels.append(self.rainbow[i])
+                    pixels.append(self.black)
+                    pixels.append(self.black)
+                    pixels.append(self.black)
                 else: # mag > 127
                     for i in range(4):
-                        pixels.append(rainbow[i])
-                    pixels.append([c // 2 for c in rainbow[i]])
-                    pixels.append(black)
-                    pixels.append(black)
-                    pixels.append(black)
+                        pixels.append(self.rainbow[i])
+                    pixels.append([c // 2 for c in self.rainbow[i]])
+                    pixels.append(self.black)
+                    pixels.append(self.black)
+                    pixels.append(self.black)
                     
             elif mag > 63:
                 if mag > 95:
                     if mag > 111:
                         #print("> 111")
                         for i in range(4):
-                            pixels.append(rainbow[i])
-                        pixels.append(black)
-                        pixels.append(black)
-                        pixels.append(black)
-                        pixels.append(black)
+                            pixels.append(self.rainbow[i])
+                        pixels.append(self.black)
+                        pixels.append(self.black)
+                        pixels.append(self.black)
+                        pixels.append(self.black)
                     else: # mag > 95
                         #print("> 95")
-                        pixels.append(rainbow[i])
-                        pixels.append(rainbow[i])
-                        pixels.append(rainbow[i])
-                        pixels.append([c // 2 for c in rainbow[i]])
+                        pixels.append(self.rainbow[i])
+                        pixels.append(self.rainbow[i])
+                        pixels.append(self.rainbow[i])
+                        pixels.append([c // 2 for c in self.rainbow[i]])
                         for i in range(4):
-                            pixels.append(black)
+                            pixels.append(self.black)
                 elif mag > 79:
                     #print("> 79")
-                    pixels.append(rainbow[i])
-                    pixels.append(rainbow[i])
-                    pixels.append(rainbow[i])
+                    pixels.append(self.rainbow[i])
+                    pixels.append(self.rainbow[i])
+                    pixels.append(self.rainbow[i])
                     for i in range(5):
-                        pixels.append(black)
+                        pixels.append(self.black)
                 else: # mag > 63
                     #rint("> 63")
-                    pixels.append(rainbow[i])
-                    pixels.append(rainbow[i])
-                    pixels.append([c // 2 for c in rainbow[i]])
+                    pixels.append(self.rainbow[i])
+                    pixels.append(self.rainbow[i])
+                    pixels.append([c // 2 for c in self.rainbow[i]])
                     for i in range(5):
-                        pixels.append(black)
+                        pixels.append(self.black)
             elif mag > 31:
                 if mag > 47:
                     #print("> 47")
-                    pixels.append(rainbow[i])
-                    pixels.append(rainbow[i])
+                    pixels.append(self.rainbow[i])
+                    pixels.append(self.rainbow[i])
                     for i in range(6):
-                        pixels.append(black)
+                        pixels.append(self.black)
                 else: # mag > 31:
                     #print("> 31")
-                    pixels.append(rainbow[i])
-                    pixels.append([c // 2 for c in rainbow[i]])
+                    pixels.append(self.rainbow[i])
+                    pixels.append([c // 2 for c in self.rainbow[i]])
                     for i in range(6):
-                        pixels.append(black)
+                        pixels.append(self.black)
             elif mag > 15:
                 #print("> 15")
-                pixels.append(rainbow[i])
+                pixels.append(self.rainbow[i])
                 for i in range(7):
-                    pixels.append(black)
+                    pixels.append(self.black)
             else:
                 #print("> 0")
-                pixels.append([c // 2 for c in rainbow[i]])
+                pixels.append([c // 2 for c in self.rainbow[i]])
                 for i in range(7):
-                    pixels.append(black)
+                    pixels.append(self.black)
         return pixels
         
+    def display_mode_3(self, magnitudes):
+        pixels = []
+        for mag in magnitudes:
+            if mag > 255:
+                mag = 255
+            i = 0
+            while mag > 31:
+                pixels.append(self.rainbow[i])
+                i += 1
+                mag -= 32
+            if mag > 0:
+                pixels.append(np.floor_divide(self.rainbow[i], (32 / mag)))
+                i += 1
+            while i < 8:
+                pixels.append(self.black)
+                i += 1
+        return pixels
         
-        
-    def old_mode_1(self, intensity):
-        if intensity > 255:
-            intensity = 255
+    def old_mode_1(self, magnitude):
+        if magnitude > 255:
+            magnitude = 255
         pixels = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
-        n = (8 * intensity / 255)
+        n = (8 * magnitude / 255)
         for i in range(n):
-            pixels[i-n] = [intensity, intensity // 3, intensity // 2]
+            pixels[i-n] = [magnitude, magnitude // 3, magnitude // 2]
         return pixels
         
         
-    def old_mode_2(self, intensity):
-        if intensity > 255:
-            intensity = 255
+    def old_mode_2(self, magnitude):
+        if magnitude > 255:
+            magnitude = 255
         pixels = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
-        if intensity > 32:
-            pixels[7] = [intensity, intensity // 3, intensity // 2]
-        if intensity > 64:
-            pixels[6] = [intensity, intensity // 3, intensity // 2]
-        if intensity > 96:
-            pixels[5] = [intensity, intensity // 3, intensity // 2]
-        if intensity > 128:
-            pixels[4] = [intensity, intensity // 3, intensity // 2]
-        if intensity > 160:
-            pixels[3] = [intensity, intensity // 3, intensity // 2]
-        if intensity > 192:
-            pixels[2] = [intensity, intensity // 3, intensity // 2]
-        if intensity > 224:
-            pixels[1] = [intensity, intensity // 3, intensity // 2]
-        if intensity == 255:
-            pixels[0] = [intensity, intensity // 3, intensity // 2]
+        if magnitude > 32:
+            pixels[7] = [magnitude, magnitude // 3, magnitude // 2]
+        if magnitude > 64:
+            pixels[6] = [magnitude, magnitude // 3, magnitude // 2]
+        if magnitude > 96:
+            pixels[5] = [magnitude, magnitude // 3, magnitude // 2]
+        if magnitude > 128:
+            pixels[4] = [magnitude, magnitude // 3, magnitude // 2]
+        if magnitude > 160:
+            pixels[3] = [magnitude, magnitude // 3, magnitude // 2]
+        if magnitude > 192:
+            pixels[2] = [magnitude, magnitude // 3, magnitude // 2]
+        if magnitude > 224:
+            pixels[1] = [magnitude, magnitude // 3, magnitude // 2]
+        if magnitude == 255:
+            pixels[0] = [magnitude, magnitude // 3, magnitude // 2]
         return pixels
             
   
