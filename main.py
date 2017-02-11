@@ -33,7 +33,6 @@ import wave
 import numpy as np
 import time
 import multiprocessing as mp
-import Queue
 import math
 import audioVisualization as auvi
 import audioExtraction as auex
@@ -46,7 +45,6 @@ def main(args):
         tmp_file_exists = False
         path, filename = os.path.split(args[1])
         filename, extension = os.path.splitext(filename)
-        filepath = ""
         
         # Convert compressed formats to a temp wav file
         if extension != ".wav":
@@ -58,11 +56,11 @@ def main(args):
             sp.call(["ffmpeg", "-i", args[1], wavpath], stdout=FNULL, stderr=sp.STDOUT)
             tmp_file_exists = True
         else:
-            filepath = args[1]
+            wavpath = args[1]
             
         try: # Handle KeyboardInterrupt exception
             pool = mp.Pool(processes=3)
-            q = Queue.Queue(100)
+            q = mp.Queue(100)
             
             wf = wave.open(wavpath, 'rb')
             nb_channels = wf.getnchannels()
@@ -116,6 +114,7 @@ def main(args):
             q.close()
             pool.terminate()
         finally:
+            auvi.clear_display()
             # Delete temp wav file if necessary
             if tmp_file_exists:
                 os.remove(wavpath)
