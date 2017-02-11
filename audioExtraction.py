@@ -73,7 +73,7 @@ def calculate_magnitudes(data, frame_count, nb_channels):
     
     # Calculate the Fourier Transform coefficients
     dft_array = cv2.dft(np.float32(windowed_data))
-    
+
     # Return the power in each frequency
     magnitudes = np.add(np.sqrt((dft_array*dft_array).sum(axis=1)), 10)
     log_mag = np.log10(magnitudes)

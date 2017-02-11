@@ -29,7 +29,7 @@ from sense_hat import SenseHat
 import time
 import numpy as np
 
-class Matrix(SenseHat):
+class Display(SenseHat):
     """
     Class containing additional methods for operating the LED matrix
     """
@@ -39,15 +39,16 @@ class Matrix(SenseHat):
         
         # Color definitions:
         self.black = [0, 0, 0]
-        self.indigo = [55, 30, 128]
-        self.electric = [30, 70, 128]
-        self.emerald = [50, 210, 175]
-        self.lime = [90, 255, 200]
-        self.yellow = [220, 220, 100]
-        self.orange = [255, 180, 100]
-        self.red = [255, 140, 140]
-        self.white = [255, 255, 255]
-        self.rainbow = [self.indigo, self.electric, self.emerald, self.lime, self.yellow, self.orange, self.red, self.white]
+        self.indigo = [80, 30, 128]
+        self.electric = [30, 115, 128]
+        self.lime = [75, 230, 180]
+        self.yellow = [215, 215, 90]
+        self.orange = [235, 175, 60]
+        self.fire = [245, 150, 70]
+        self.red = [255, 110, 110]
+        self.scarlett = [255, 190, 190]
+        self.rainbow = [self.indigo, self.electric, self.lime,
+                        self.yellow, self.orange, self.fire, self.red, self.scarlett]
 
     def set_column(self, col, pixel_list):
         """
@@ -311,6 +312,10 @@ class Matrix(SenseHat):
         return pixels
         
     def display_mode_3(self, magnitudes):
+        """
+        Takes an array of 8 magnitudes and returns
+        the corresponding matrix of 8 8-pixel columns
+        """
         pixels = []
         for mag in magnitudes:
             if mag > 255:
@@ -327,38 +332,27 @@ class Matrix(SenseHat):
                 pixels.append(self.black)
                 i += 1
         return pixels
-        
-    def old_mode_1(self, magnitude):
-        if magnitude > 255:
-            magnitude = 255
-        pixels = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
-        n = (8 * magnitude / 255)
-        for i in range(n):
-            pixels[i-n] = [magnitude, magnitude // 3, magnitude // 2]
-        return pixels
-        
-        
-    def old_mode_2(self, magnitude):
-        if magnitude > 255:
-            magnitude = 255
-        pixels = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
-        if magnitude > 32:
-            pixels[7] = [magnitude, magnitude // 3, magnitude // 2]
-        if magnitude > 64:
-            pixels[6] = [magnitude, magnitude // 3, magnitude // 2]
-        if magnitude > 96:
-            pixels[5] = [magnitude, magnitude // 3, magnitude // 2]
-        if magnitude > 128:
-            pixels[4] = [magnitude, magnitude // 3, magnitude // 2]
-        if magnitude > 160:
-            pixels[3] = [magnitude, magnitude // 3, magnitude // 2]
-        if magnitude > 192:
-            pixels[2] = [magnitude, magnitude // 3, magnitude // 2]
-        if magnitude > 224:
-            pixels[1] = [magnitude, magnitude // 3, magnitude // 2]
-        if magnitude == 255:
-            pixels[0] = [magnitude, magnitude // 3, magnitude // 2]
-        return pixels
-            
-  
+    
+    
+    def display_mode_4(self, magnitudes):
+        """
+        Takes an array of 8 magnitudes and returns
+        the corresponding matrix of eight 8-pixel columns
+        """
+        pixels = []
+        for mag in magnitudes:
+            if mag > 255:
+                mag = 255
+                
+            i = 0
+            while mag > 31:
+                pixels.append(np.divide(self.rainbow[i], (2-(i/8))))
+                i += 1
+                mag -= 32
+            if mag > 0:
+                pixels.append(np.floor_divide(self.rainbow[i], (32 / mag)))
+                i += 1
+            while i < 8:
+                pixels.append(self.black)
+                i += 1
         return pixels
