@@ -54,6 +54,7 @@ def avg_and_rescale(magnitudes):
     mag_scaled = []
     for i in mags_avged:
         mag_scaled.append((i / mag_max) * 255)
+        
     return mag_scaled
     
     
@@ -79,6 +80,7 @@ def avg_and_rescale_2(magnitudes):
     mag_scaled = []
     for i in mags_avged:
         mag_scaled.append((i / mag_max) * 255)
+        
     return mag_scaled
     
     
@@ -99,7 +101,8 @@ def avg_and_rescale_3(magnitudes):
                   sum(slice5/len(slice5)), sum(slice6/len(slice6)),
                   sum(slice7/len(slice7)), sum(slice8/len(slice8))]
                   
-    #
+    # Squaring the magnitudes allows for more dynamic variations
+    # This is purely visual
     mags_squared = np.square(mags_avged)
                   
     # Rescale, mag_max determined by trial and error
@@ -107,6 +110,7 @@ def avg_and_rescale_3(magnitudes):
     mag_scaled = []
     for mag in mags_squared:
         mag_scaled.append((mag / mag_max) * 255)
+        
     return mag_scaled
     
     
@@ -127,7 +131,8 @@ def avg_and_rescale_4(magnitudes):
                   sum(slice5/len(slice5)), sum(slice6/len(slice6)),
                   sum(slice7/len(slice7)), sum(slice8/len(slice8))]
                   
-    #
+    # Squaring the magnitudes allows for more dynamic variations
+    # This is purely visual
     mags_squared = np.square(mags_avged)
                   
     # Rescale, mag_max determined by trial and error
@@ -135,8 +140,41 @@ def avg_and_rescale_4(magnitudes):
     mag_scaled = []
     for mag in mags_squared:
         mag_scaled.append((mag / mag_max) * 255)
+        
     return mag_scaled
+   
+   
+def avg_and_rescale_5(magnitudes):   
+    # Custom slices following a logarithmic progression
+    # that is closer to human hearing 
+    slice1 = magnitudes[:23]
+    slice2 = magnitudes[24:47]
+    slice3 = magnitudes[48:79]
+    slice4 = magnitudes[80:127]
+    slice5 = magnitudes[128:191]
+    slice6 = magnitudes[192:255]
+    slice7 = magnitudes[256:383]
+    slice8 = magnitudes[384:575]
     
+    mags_avged = [sum(slice1/len(slice1)), sum(slice2/len(slice2)),
+                  sum(slice3/len(slice3)), sum(slice4/len(slice4)),
+                  sum(slice5/len(slice5)), sum(slice6/len(slice6)),
+                  sum(slice7/len(slice7)), sum(slice8/len(slice8))]
+                  
+    # Squaring the magnitudes allows for more dynamic variations
+    # This is purely visual
+    mags_squared = np.square(mags_avged)
+    
+    mags_squared = np.multiply(mags_squared, [0.9, 0.95, 1.0, 1.0, 1.0, 1.0, 1.05, 1.1])
+                  
+    # Rescale, mag_max determined by trial and error
+    mag_max = 32
+    mag_scaled = []
+    for mag in mags_squared:
+        mag_scaled.append((mag / mag_max) * 255)
+        
+    return mag_scaled
+        
 
 def display_eq(magnitudes):
     magnitudes = avg_and_rescale(magnitudes)
@@ -145,7 +183,7 @@ def display_eq(magnitudes):
 
 
 def display_64(magnitudes):
-    float_magnitudes = avg_and_rescale_3(magnitudes)
+    float_magnitudes = avg_and_rescale_5(magnitudes)
     int_magnitudes = [int(mag) for mag in float_magnitudes]
     display.set_pixels(display.display_mode_4(int_magnitudes))
 
