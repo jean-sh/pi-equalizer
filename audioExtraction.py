@@ -30,36 +30,6 @@ import cv2
 import struct
 
 
-def calculate_frequency_ranges(data, frame_count, frame_rate, nb_channels):
-    """
-    Unused
-    """
-    
-    data = np.array(struct.unpack('{n}h'.format(n=nb_channels * frame_count), data))
-    # Calculate the Fourier Transform coefficients
-    dft_array = cv2.dft(np.float32(data))
-
-    # Calculate the frequencies associated
-    freqs = np.fft.fftfreq(len(dft_array))
-    freqs_hertz = []
-    for freq in freqs:
-        freqs_hertz.append(abs(freq * frame_rate))
-    
-    # TODO
-    length = len(freqs_hertz)
-    custom_freqs = [58, 130, 292, 657, 1478, 3325, 7482, 16834]
-    
-    # Calculate frequency boundaries
-    boundaries = []
-    for i in range(len(custom_freqs) - 1):
-        # Using the geometric mean seems better than arithmetic mean here
-        b = np.sqrt((custom_freqs[i] * custom_freqs[i+1]))
-        boundaries.append(b)
-    boundaries.append(22050)
-
-    return freqs_hertz, boundaries
-
-
 def calculate_magnitudes(data, frame_count, nb_channels):
     """
     TODO

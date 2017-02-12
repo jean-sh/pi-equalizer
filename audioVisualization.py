@@ -143,10 +143,12 @@ def display_eq(magnitudes):
     for i in range(8):
         display.set_column(7-i, display.mode_three(int(magnitudes[i])))
 
+
 def display_64(magnitudes):
     float_magnitudes = avg_and_rescale_3(magnitudes)
     int_magnitudes = [int(mag) for mag in float_magnitudes]
     display.set_pixels(display.display_mode_4(int_magnitudes))
-    
+
+
 def clear_display():
     display.clear()

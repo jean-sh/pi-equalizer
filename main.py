@@ -30,10 +30,8 @@ import os
 import subprocess as sp
 import pyaudio
 import wave
-import numpy as np
 import time
 import multiprocessing as mp
-import math
 import audioVisualization as auvi
 import audioExtraction as auex
 
@@ -45,28 +43,25 @@ def main(args):
         tmp_file_exists = False
         path, filename = os.path.split(args[1])
         filename, extension = os.path.splitext(filename)
-        
-        try: # Handle KeyboardInterrupt exception
+        wav_path = args[1]
+        pool = mp.Pool(processes=3)
+        q = mp.Queue(64)
+
+        try:  # Handle KeyboardInterrupt exception
             
             # Convert compressed formats to a temp wav file
             if extension != ".wav":
-                FNULL = open(os.devnull, "w")
+                fnull = open(os.devnull, "w")
                 pieq_tmp = os.path.expanduser("~") + "/.pieq_tmp/"
-                wavpath = pieq_tmp + filename + ".wav"
+                wav_path = pieq_tmp + filename + ".wav"
                 
-                if not os.path.isfile(wavpath):
+                if not os.path.isfile(wav_path):
                     print("Decompressing...")
                     sp.call(["mkdir", "-p", pieq_tmp])
-                    sp.call(["ffmpeg", "-i", args[1], wavpath], stdout=FNULL, stderr=sp.STDOUT)
+                    sp.call(["ffmpeg", "-i", args[1], wav_path], stdout=fnull, stderr=sp.STDOUT)
                     tmp_file_exists = True
-            else:
-                wavpath = args[1]
-            
-        
-            pool = mp.Pool(processes=3)
-            q = mp.Queue(64)
-            
-            wf = wave.open(wavpath, 'rb')
+
+            wf = wave.open(wav_path, 'rb')
             nb_channels = wf.getnchannels()
             frame_rate = wf.getframerate()
 
@@ -76,13 +71,8 @@ def main(args):
             # define callback
             def callback(in_data, frame_count, time_info, status):
                 data = wf.readframes(frame_count)
-                try:
-                    q.put_nowait(data)
-                except:
-                    pass
-                
+                q.put_nowait(data)
                 return data, pyaudio.paContinue
-
 
             # open stream using callback
             stream = pyau.open(format=pyau.get_format_from_width(wf.getsampwidth()),
@@ -90,8 +80,7 @@ def main(args):
                                rate=frame_rate,
                                output=True,
                                stream_callback=callback)
-          
-            
+
             # start the stream
             pool.apply_async(stream.start_stream)
             
@@ -101,12 +90,11 @@ def main(args):
                 while q.qsize() < 30: 
                     time.sleep(0.05)
                     break
-                data = q.get(0.1)
+                q_data = q.get(0.1)
 
-                magnitudes = pool.apply(auex.calculate_magnitudes, (data, 1024, nb_channels))
+                magnitudes = pool.apply(auex.calculate_magnitudes, (q_data, 1024, nb_channels))
                 pool.apply_async(auvi.display_64, (magnitudes,))
 
-            
             # stop stream
             stream.stop_stream()
             stream.close()
@@ -123,7 +111,7 @@ def main(args):
             auvi.clear_display()
             # Delete temp wav file if necessary
             if tmp_file_exists:
-                os.remove(wavpath)
+                os.remove(wav_path)
                 
     return 0
 
