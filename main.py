@@ -41,9 +41,11 @@ def main(args):
         print("usage: ./main.py <audio file path>")
     else:
         tmp_file_exists = False
-        path, filename = os.path.split(args[1])
-        filename, extension = os.path.splitext(filename)
+
         wav_path = args[1]
+        path, filename = os.path.split(wav_path)
+        filename, extension = os.path.splitext(filename)
+
         pool = mp.Pool(processes=3)
         q = mp.Queue(64)
 
