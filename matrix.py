@@ -102,3 +102,26 @@ class Display(SenseHat):
                 pixels.append(self.black)
                 i += 1
         return pixels
+        
+    def display_mode_5(self, magnitudes):
+        """
+        Takes an array of 8 magnitudes and returns
+        the corresponding matrix of eight 8-pixel columns
+        """
+        pixels = []
+        for mag in magnitudes:
+            if mag > 255:
+                mag = 255
+                
+            i = 0
+            while mag > 31:
+                pixels.append(np.divide(self.yellow, (2-(i/8))))
+                i += 1
+                mag -= 32
+            if mag > 0:
+                pixels.append(np.floor_divide(self.yellow, (32 / mag)))
+                i += 1
+            while i < 8:
+                pixels.append(self.black)
+                i += 1
+        return pixels
