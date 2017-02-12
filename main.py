@@ -32,16 +32,14 @@ import pyaudio
 import wave
 import time
 import multiprocessing as mp
-import audioVisualization as auvi
-import audioExtraction as auex
+import audioVisualization as auVi
+import audioExtraction as auEx
 
 
 def main(args):
     if len(args) != 2:
         print("usage: ./main.py <audio file path>")
     else:
-        tmp_file_exists = False
-
         wav_path = args[1]
         path, filename = os.path.split(wav_path)
         filename, extension = os.path.splitext(filename)
@@ -61,7 +59,6 @@ def main(args):
                     print("Decompressing...")
                     sp.call(["mkdir", "-p", pieq_tmp])
                     sp.call(["ffmpeg", "-i", args[1], wav_path], stdout=fnull, stderr=sp.STDOUT)
-                    tmp_file_exists = True
 
             wf = wave.open(wav_path, 'rb')
             nb_channels = wf.getnchannels()
@@ -94,8 +91,8 @@ def main(args):
                     break
                 q_data = q.get(0.1)
 
-                magnitudes = pool.apply(auex.calculate_magnitudes, (q_data, 1024, nb_channels))
-                pool.apply_async(auvi.display_64, (magnitudes,))
+                magnitudes = pool.apply(auEx.calculate_magnitudes, (q_data, 1024, nb_channels))
+                pool.apply_async(auVi.display_64, (magnitudes,))
 
             # stop stream
             stream.stop_stream()
@@ -108,12 +105,12 @@ def main(args):
         except KeyboardInterrupt:
             print("Stopping...")
         finally:
-            q.close()
-            pool.terminate()
-            auvi.clear_display()
             # Delete temp wav file if necessary
-            if tmp_file_exists:
+            if os.path.isfile(wav_path):
                 os.remove(wav_path)
+            auVi.clear_display()
+            q.close()
+            pool.terminate()         
                 
     return 0
 
