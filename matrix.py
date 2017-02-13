@@ -39,16 +39,22 @@ class Display(SenseHat):
         
         # Color definitions:
         self.black = [0, 0, 0]
+        self.purple = [128, 0, 255]
+        self.magenta = [255, 0, 255]
+        self.fashion = [255, 0, 128]
         self.indigo = [80, 30, 128]
         self.electric = [30, 115, 128]
-        self.lime = [75, 230, 180]
+        self.emerald = [75, 230, 180]
         self.yellow = [215, 215, 90]
         self.orange = [235, 175, 60]
         self.fire = [245, 150, 70]
         self.red = [255, 110, 110]
         self.scarlett = [255, 190, 190]
-        self.rainbow = [self.indigo, self.electric, self.lime,
-                        self.yellow, self.orange, self.fire, self.red, self.scarlett]
+        self.pink = [255, 50, 255]
+        self.rainbow = [self.indigo, self.electric, self.emerald, self.yellow,
+                        self.orange, self.fire, self.red, self.scarlett]
+        self.pink_rbow = [self.indigo, self.red, self.red,
+                          self.scarlett, self.scarlett, self.pink, self.pink]
 
     def set_column(self, col, pixel_list):
         """
@@ -58,7 +64,7 @@ class Display(SenseHat):
         for x in range(8):
             self.set_pixel(x, col, pixel_list[x])
 
-    def display_mode_3(self, magnitudes):
+    def display_m_3(self, magnitudes):
         """
         Takes an array of 8 magnitudes and returns
         the corresponding matrix of 8 8-pixel columns
@@ -80,7 +86,7 @@ class Display(SenseHat):
                 i += 1
         return pixels
     
-    def display_mode_4(self, magnitudes):
+    def m_rainbow(self, magnitudes):
         """
         Takes an array of 8 magnitudes and returns
         the corresponding matrix of eight 8-pixel columns
@@ -102,8 +108,31 @@ class Display(SenseHat):
                 pixels.append(self.black)
                 i += 1
         return pixels
+    
+    def m_pink(self, magnitudes):
+        """
+        Takes an array of 8 magnitudes and returns
+        the corresponding matrix of eight 8-pixel columns
+        """
+        pixels = []
+        for mag in magnitudes:
+            if mag > 255:
+                mag = 255
+                
+            i = 0
+            while mag > 31:
+                pixels.append(np.divide(self.pink_rbow[i], (2-(i/8))))
+                i += 1
+                mag -= 32
+            if mag > 0:
+                pixels.append(np.floor_divide(self.pink_rbow[i], (32 / mag)))
+                i += 1
+            while i < 8:
+                pixels.append(self.black)
+                i += 1
+        return pixels
         
-    def display_mode_5(self, magnitudes):
+    def m_yellow(self, magnitudes):
         """
         Takes an array of 8 magnitudes and returns
         the corresponding matrix of eight 8-pixel columns
@@ -120,6 +149,29 @@ class Display(SenseHat):
                 mag -= 32
             if mag > 0:
                 pixels.append(np.floor_divide(self.yellow, (32 / mag)))
+                i += 1
+            while i < 8:
+                pixels.append(self.black)
+                i += 1
+        return pixels
+
+    def m_emerald(self, magnitudes):
+        """
+        Takes an array of 8 magnitudes and returns
+        the corresponding matrix of eight 8-pixel columns
+        """
+        pixels = []
+        for mag in magnitudes:
+            if mag > 255:
+                mag = 255
+                
+            i = 0
+            while mag > 31:
+                pixels.append(np.divide(self.emerald, (2-(i/8))))
+                i += 1
+                mag -= 32
+            if mag > 0:
+                pixels.append(np.floor_divide(self.emerald, (32 / mag)))
                 i += 1
             while i < 8:
                 pixels.append(self.black)
