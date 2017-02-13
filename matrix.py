@@ -95,7 +95,7 @@ class Colors:
     ice_bow = [d_violet, d_blue, m_electric, m_cyan, b_cyan, b_emerald, white, white]
     fire_bow = [white, b_yellow, b_yellow, b_orange, m_orange, b_red, b_red, b_red]
     pink_bow = [u_violet, u_magenta, white, m_magenta, b_magenta, b_fashion, b_fashion, white]
-    reverse_bow = [d_red, d_orange, m_yellow, m_green, b_blue, b_violet, b_violet]
+    reverse_bow = [d_red, m_orange, m_yellow, m_green, b_cyan, b_blue, b_violet, b_violet]
 
 
 class Display(SenseHat):
