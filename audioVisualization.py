@@ -186,13 +186,13 @@ def display_64(magnitudes, mode):
     float_magnitudes = avg_and_rescale_5(magnitudes)
     int_magnitudes = [int(mag) for mag in float_magnitudes]
     if mode == 0:
-        display.set_pixels(display.m_rainbow(int_magnitudes))
+        display.set_pixels(Display.rainbow(int_magnitudes))
     elif mode == 1:
-        display.set_pixels(display.m_pink(int_magnitudes))
+        display.set_pixels(Display.fire_bow(int_magnitudes))
     elif mode == 2:
-        display.set_pixels(display.m_emerald(int_magnitudes))
+        display.set_pixels(Display.ice_bow(int_magnitudes))
     elif mode == 3:
-        display.set_pixels(display.m_yellow(int_magnitudes))
+        display.set_pixels(Display.ice_bow(int_magnitudes))
 
 
 def clear_display():
