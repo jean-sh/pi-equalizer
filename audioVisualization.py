@@ -168,7 +168,7 @@ def avg_and_rescale_5(magnitudes):
     mags_squared = np.multiply(mags_squared, [0.9, 0.95, 1.0, 1.0, 1.0, 1.0, 1.05, 1.1])
                   
     # Rescale, mag_max determined by trial and error
-    mag_max = 32
+    mag_max = 30
     mag_scaled = []
     for mag in mags_squared:
         mag_scaled.append((mag / mag_max) * 255)
@@ -192,8 +192,8 @@ def display_64(magnitudes, mode):
     elif mode == 2:
         display.set_pixels(Display.ice_bow(int_magnitudes))
     elif mode == 3:
-        display.set_pixels(Display.ice_bow(int_magnitudes))
-
+        display.set_pixels(Display.pink_bow(int_magnitudes))
+        
 
 def clear_display():
     display.clear()

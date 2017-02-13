@@ -60,11 +60,12 @@ class Colors:
     m_orange = [192, 96, 0]
     m_red = [192, 0, 0]
     m_fashion = [192, 0, 96]
+    m_white = [128, 128, 128]
 
     # Dark
     d_magenta = [128, 0, 128]
-    d_violet = [64, 0, 128]
-    d_blue = [0, 0, 128]
+    d_violet = [96, 0, 128]
+    d_blue = [0, 0, 160]
     d_electric = [0, 64, 128]
     d_cyan = [0, 128, 128]
     d_emerald = [0, 128, 64]
@@ -74,11 +75,26 @@ class Colors:
     d_orange = [128, 64, 0]
     d_red = [128, 0, 0]
     d_fashion = [128, 0, 64]
+    
+    # Desatured
+    u_magenta = [128, 96, 128]
+    u_violet = [128, 96, 160]
+    u_blue = [96, 96, 160]
+    u_electric = [96, 128, 160]
+    u_cyan = [96, 160, 160]
+    u_emerald = [96, 160, 128]
+    u_green = [96, 160, 96]
+    u_citrus = [128, 160, 96]
+    u_yellow = [160, 160, 96]
+    u_orange = [160, 128, 96]
+    u_red = [160, 96, 96]
+    u_fashion = [192, 96, 128]
 
     # Rainbows
     rainbow = [d_violet, d_blue, m_cyan, m_green, b_yellow, b_orange, b_red, b_red]
     ice_bow = [d_violet, d_blue, m_electric, m_cyan, b_cyan, b_emerald, white, white]
-    fire_bow = [white, b_yellow, b_yellow, b_orange, m_orange, d_red, d_red, d_red]
+    fire_bow = [white, b_yellow, b_yellow, b_orange, m_orange, b_red, b_red, b_red]
+    pink_bow = [u_violet, u_magenta, white, m_magenta, b_magenta, b_fashion, b_fashion, white]
 
 
 class Display(SenseHat):
@@ -157,41 +173,19 @@ class Display(SenseHat):
                 
             i = 0
             while mag > 31:
-                pixels.append(np.divide(Color.ice_bow[i], (2-(i/8))))
+                pixels.append(np.divide(Colors.ice_bow[i], (2-(i/8))))
                 i += 1
                 mag -= 32
             if mag > 0:
-                pixels.append(np.floor_divide(Color.ice_bow[i], (32 / mag)))
-                i += 1
-            while i < 8:
-                pixels.append(Color.black)
-                i += 1
-        return pixels
-        
-    def fire_bow(self, magnitudes):
-        """
-        Takes an array of 8 magnitudes and returns
-        the corresponding matrix of eight 8-pixel columns
-        """
-        pixels = []
-        for mag in magnitudes:
-            if mag > 255:
-                mag = 255
-
-            i = 0
-            while mag > 31:
-                pixels.append(np.divide(Colors.fire_bow, (2 - (i / 8))))
-                i += 1
-                mag -= 32
-            if mag > 0:
-                pixels.append(np.floor_divide(Colors.fire_bow, (32 / mag)))
+                pixels.append(np.floor_divide(Colors.ice_bow[i], (32 / mag)))
                 i += 1
             while i < 8:
                 pixels.append(Colors.black)
                 i += 1
         return pixels
-
-    def m_emerald(self, magnitudes):
+        
+    @staticmethod
+    def fire_bow(magnitudes):
         """
         Takes an array of 8 magnitudes and returns
         the corresponding matrix of eight 8-pixel columns
@@ -200,16 +194,40 @@ class Display(SenseHat):
         for mag in magnitudes:
             if mag > 255:
                 mag = 255
-                
+
             i = 0
             while mag > 31:
-                pixels.append(np.divide(Color.emerald, (2-(i/8))))
+                pixels.append(np.divide(Colors.fire_bow[i], (2 - (i / 8))))
                 i += 1
                 mag -= 32
             if mag > 0:
-                pixels.append(np.floor_divide(Color.emerald, (32 / mag)))
+                pixels.append(np.floor_divide(Colors.fire_bow[i], (32 / mag)))
                 i += 1
             while i < 8:
-                pixels.append(Color.black)
+                pixels.append(Colors.black)
+                i += 1
+        return pixels
+        
+    @staticmethod
+    def pink_bow(magnitudes):
+        """
+        Takes an array of 8 magnitudes and returns
+        the corresponding matrix of eight 8-pixel columns
+        """
+        pixels = []
+        for mag in magnitudes:
+            if mag > 255:
+                mag = 255
+
+            i = 0
+            while mag > 31:
+                pixels.append(np.divide(Colors.pink_bow[i], (2 - (i / 8))))
+                i += 1
+                mag -= 32
+            if mag > 0:
+                pixels.append(np.floor_divide(Colors.pink_bow[i], (32 / mag)))
+                i += 1
+            while i < 8:
+                pixels.append(Colors.black)
                 i += 1
         return pixels
