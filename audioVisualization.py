@@ -179,13 +179,20 @@ def avg_and_rescale_5(magnitudes):
 def display_eq(magnitudes):
     magnitudes = avg_and_rescale(magnitudes)
     for i in range(8):
-        display.set_column(7-i, display.mode_three(int(magnitudes[i])))
+        display.set_column(7-i, display.m_three(int(magnitudes[i])))
 
 
-def display_64(magnitudes):
+def display_64(magnitudes, mode):
     float_magnitudes = avg_and_rescale_5(magnitudes)
     int_magnitudes = [int(mag) for mag in float_magnitudes]
-    display.set_pixels(display.display_mode_4(int_magnitudes))
+    if mode == 0:
+        display.set_pixels(display.m_rainbow(int_magnitudes))
+    elif mode == 1:
+        display.set_pixels(display.m_pink(int_magnitudes))
+    elif mode == 2:
+        display.set_pixels(display.m_emerald(int_magnitudes))
+    elif mode == 3:
+        display.set_pixels(display.m_yellow(int_magnitudes))
 
 
 def clear_display():
