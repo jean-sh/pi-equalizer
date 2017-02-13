@@ -89,6 +89,7 @@ def main(args):
             pool.apply_async(stream.start_stream)
             
             # Process the data and display it while the stream is running
+            nb_of_modes = 6
             mode = 0
             while stream.is_active():
                 # This creates a delay so that audio and display are synchronized
@@ -99,7 +100,7 @@ def main(args):
                     
                 # Calculate and display
                 magnitudes = pool.apply(auEx.calculate_magnitudes, (q_data, 1024, nb_channels))
-                pool.apply_async(auVi.display_64, (magnitudes, mode))
+                pool.apply_async(auVi.display_eq, (magnitudes, mode))
                 
                 # Watch for joystick events and change mode accordingly
                 event = joystick.stick.get_events()
@@ -111,7 +112,7 @@ def main(args):
                     elif (event[0].direction == "up" or event[0].direction == "down") \
                     and event[0].action == "released":
                         mode = 0
-                    mode %= 5
+                    mode %= nb_of_modes
 
             # stop stream
             stream.stop_stream()
