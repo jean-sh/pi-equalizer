@@ -34,6 +34,7 @@ import time
 import multiprocessing as mp
 import audioVisualization as auVi
 import audioExtraction as auEx
+from sense_hat import SenseHat
 
 
 def main(args):
@@ -43,6 +44,9 @@ def main(args):
         wav_path = args[1]
         path, filename = os.path.split(wav_path)
         filename, extension = os.path.splitext(filename)
+        tmp_file_created = False
+
+        joystick = SenseHat()
 
         pool = mp.Pool(processes=3)
         q = mp.Queue(64)
@@ -59,6 +63,7 @@ def main(args):
                     print("Decompressing...")
                     sp.call(["mkdir", "-p", pieq_tmp])
                     sp.call(["ffmpeg", "-i", args[1], wav_path], stdout=fnull, stderr=sp.STDOUT)
+                tmp_file_created = True
 
             wf = wave.open(wav_path, 'rb')
             nb_channels = wf.getnchannels()
@@ -84,15 +89,26 @@ def main(args):
             pool.apply_async(stream.start_stream)
             
             # Process the data and display it while the stream is running
+            mode = 0
             while stream.is_active():
                 # This creates a delay so that audio and display are synchronized
                 while q.qsize() < 30: 
                     time.sleep(0.05)
                     break
                 q_data = q.get(0.1)
-
+                    
+                # Calculate and display
                 magnitudes = pool.apply(auEx.calculate_magnitudes, (q_data, 1024, nb_channels))
-                pool.apply_async(auVi.display_64, (magnitudes,))
+                pool.apply_async(auVi.display_64, (magnitudes, mode))
+                
+                # Watch for joystick events and change mode accordingly
+                event = joystick.stick.get_events()
+                if event != []:
+                    if event[0].direction == "right" and event[0].action == "released":
+                        mode += 1
+                    elif event[0].direction == "left" and event[0].action == "released":
+                        mode -= 1
+                    mode %= 4
 
             # stop stream
             stream.stop_stream()
@@ -106,7 +122,7 @@ def main(args):
             print("Stopping...")
         finally:
             # Delete temp wav file if necessary
-            if os.path.isfile(wav_path):
+            if tmp_file_created:
                 os.remove(wav_path)
             auVi.clear_display()
             q.close()
