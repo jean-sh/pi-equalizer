@@ -111,7 +111,7 @@ def main(args):
                     elif (event[0].direction == "up" or event[0].direction == "down") \
                     and event[0].action == "released":
                         mode = 0
-                    mode %= 4
+                    mode %= 5
 
             # stop stream
             stream.stop_stream()
