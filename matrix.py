@@ -29,6 +29,58 @@ from sense_hat import SenseHat
 import numpy as np
 
 
+class Colors:
+    black = [0, 0, 0]
+    white = [255, 255, 255]
+
+    # Bright
+    b_magenta = [255, 0, 255]
+    b_violet = [128, 0, 255]
+    b_blue = [64, 64, 255]
+    b_electric = [0, 128, 255]
+    b_cyan = [0, 255, 255]
+    b_emerald = [0, 255, 128]
+    b_green = [0, 255, 0]
+    b_citrus = [128, 255, 0]
+    b_yellow = [255, 255, 0]
+    b_orange = [255, 128, 0]
+    b_red = [255, 0, 0]
+    b_fashion = [255, 0, 128]
+
+    # Medium
+    m_magenta = [192, 0, 192]
+    m_violet = [96, 0, 192]
+    m_blue = [48, 48, 192]
+    m_electric = [0, 96, 192]
+    m_cyan = [0, 192, 192]
+    m_emerald = [0, 192, 96]
+    m_green = [0, 192, 0]
+    m_citrus = [96, 192, 0]
+    m_yellow = [192, 192, 0]
+    m_orange = [192, 96, 0]
+    m_red = [192, 0, 0]
+    m_fashion = [192, 0, 96]
+
+    # Dark
+    d_magenta = [128, 0, 128]
+    d_violet = [64, 0, 128]
+    d_blue = [0, 0, 128]
+    d_electric = [0, 64, 128]
+    d_cyan = [0, 128, 128]
+    d_emerald = [0, 128, 64]
+    d_green = [0, 128, 0]
+    d_citrus = [64, 128, 0]
+    d_yellow = [128, 128, 0]
+    d_orange = [128, 64, 0]
+    d_red = [128, 0, 0]
+    d_fashion = [128, 0, 64]
+
+    # Rainbows
+    rainbow = [d_violet, d_blue, m_cyan, m_green, b_yellow, b_orange, b_red, b_red]
+    ice_bow = [d_violet, d_blue, m_electric, m_cyan, b_cyan, b_emerald, white, white]
+    fire_bow = [white, b_yellow, b_yellow, b_orange, m_orange, d_red, d_red, d_red]
+
+
 class Display(SenseHat):
     """
     Class containing additional methods for operating the LED matrix
@@ -36,19 +88,6 @@ class Display(SenseHat):
 
     def __init__(self):
         SenseHat.__init__(self)
-        
-        # Color definitions:
-        self.black = [0, 0, 0]
-        self.indigo = [80, 30, 128]
-        self.electric = [30, 115, 128]
-        self.lime = [75, 230, 180]
-        self.yellow = [215, 215, 90]
-        self.orange = [235, 175, 60]
-        self.fire = [245, 150, 70]
-        self.red = [255, 110, 110]
-        self.scarlett = [255, 190, 190]
-        self.rainbow = [self.indigo, self.electric, self.lime,
-                        self.yellow, self.orange, self.fire, self.red, self.scarlett]
 
     def set_column(self, col, pixel_list):
         """
@@ -69,17 +108,17 @@ class Display(SenseHat):
                 mag = 255
             i = 0
             while mag > 31:
-                pixels.append(self.rainbow[i])
+                pixels.append(Colors.rainbow[i])
                 i += 1
                 mag -= 32
             if mag > 0:
-                pixels.append(np.floor_divide(self.rainbow[i], (32 / mag)))
+                pixels.append(np.floor_divide(Colors.rainbow[i], (32 / mag)))
                 i += 1
             while i < 8:
-                pixels.append(self.black)
+                pixels.append(Colors.black)
                 i += 1
         return pixels
-    
+
     def display_mode_4(self, magnitudes):
         """
         Takes an array of 8 magnitudes and returns
@@ -89,20 +128,20 @@ class Display(SenseHat):
         for mag in magnitudes:
             if mag > 255:
                 mag = 255
-                
+
             i = 0
             while mag > 31:
-                pixels.append(np.divide(self.rainbow[i], (2-(i/8))))
+                pixels.append(np.divide(Colors.rainbow[i], (2 - (i / 8))))
                 i += 1
                 mag -= 32
             if mag > 0:
-                pixels.append(np.floor_divide(self.rainbow[i], (32 / mag)))
+                pixels.append(np.floor_divide(Colors.rainbow[i], (32 / mag)))
                 i += 1
             while i < 8:
-                pixels.append(self.black)
+                pixels.append(Colors.black)
                 i += 1
         return pixels
-        
+
     def display_mode_5(self, magnitudes):
         """
         Takes an array of 8 magnitudes and returns
@@ -112,16 +151,16 @@ class Display(SenseHat):
         for mag in magnitudes:
             if mag > 255:
                 mag = 255
-                
+
             i = 0
             while mag > 31:
-                pixels.append(np.divide(self.yellow, (2-(i/8))))
+                pixels.append(np.divide(Colors.yellow, (2 - (i / 8))))
                 i += 1
                 mag -= 32
             if mag > 0:
-                pixels.append(np.floor_divide(self.yellow, (32 / mag)))
+                pixels.append(np.floor_divide(Colors.yellow, (32 / mag)))
                 i += 1
             while i < 8:
-                pixels.append(self.black)
+                pixels.append(Colors.black)
                 i += 1
         return pixels
