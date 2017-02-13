@@ -194,7 +194,7 @@ def display_64(magnitudes, mode):
     elif mode == 3:
         display.set_pixels(Display.pink_bow(int_magnitudes))
     elif mode == 4:
-        display.set_pixels(Display.pink_bow(int_magnitudes))
+        display.set_pixels(Display.reverse_bow(int_magnitudes))
         
 
 def clear_display():
