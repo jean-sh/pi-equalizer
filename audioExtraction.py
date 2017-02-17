@@ -32,7 +32,8 @@ import struct
 
 def calculate_magnitudes(data, frame_count, nb_channels):
     """
-    TODO
+    Takes audio data in wav format, a frame count and the number of channels
+    (mono or stereo) and returns an array of magnitude by frequency
     """
     if nb_channels == 2:    # Strip every other sample point to keep only one channel
         data = np.array(struct.unpack('{n}h'.format(n=nb_channels * frame_count), data))[::2]
