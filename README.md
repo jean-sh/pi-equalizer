@@ -12,8 +12,8 @@ piEqualizer uses:
  * `NumPy` for data structures and maths
  * `OpenCV` for its Fourier Transform algorithm, faster than NumPy
  
-Install the API with `sudo apt install sense-hat`. Install the other modules with `pip`. To play files other than wav, `ffmpeg` is needed.
-
+To install the dependencies with apt:
+ * `sudo apt install sense-hat python-pyaudio python-numpy python-opencv ffmpeg`
 
 ### Usage
 `python path_to_folder/main.py audio_file`
