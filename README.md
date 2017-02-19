@@ -6,13 +6,14 @@ piEqualizer plays a wav file while displaying the equalizer on the Sense Hat's L
 ### Installing
 You will need a Raspberry Pi (I only tested it on the Pi 3) and the Pi's [Sense Hat](https://www.raspberrypi.org/products/sense-hat/).
 
-piEqualizer uses NumPy, OpenCV and pyAudio which you can install with `pip`.
+piEqualizer uses:
+ * the Sense HAT API
+ * `pyAudio` for playing wav files
+ * `NumPy` for data structures and maths
+ * `OpenCV` for its Fourier Transform algorithm, faster than NumPy
+ 
+Install the API with `sudo apt install sense-hat`. Install the other modules with `pip`. To play files other than wav, `ffmpeg` is needed.
+
 
 ### Usage
-`python main.py path_to_audio_file`
-
-### To do
-* better stability (sometimes still crashes at the beginning of a song)
-* improve visualization
-* selecting between different visualization modes with the Sense Hat's joystick
-* switching to Python 3 would be nice (it is complicated to install OpenCV on it unfortunately)
+`python path_to_folder/main.py audio_file`
